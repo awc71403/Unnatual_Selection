@@ -6,6 +6,9 @@ DONT PANIC AND MAKE GAMES !!!
 
 In this semester, we will be developing a tile-based game. This base project includes a simple template of a 2d tile-based game with basical movement, tiles, and characters made. And we will use this project as a sample to learn how to make games in Unity. At the end of the semster, we will (hopefully) have our own tile-based game done.
 
+# Implementation Summary:
+The way the base project functions is all the tiles are placed using the top left corner as the starting tile. The tile placements are read from a .txt file and can be edited easily for different maps. Each tile has a highlighter animation equipped and has a variable to hold any characters on the tile. There are different selection states which are basically a bunch of if/else statements. The movement system is a simple recursive algorithm to find paths and highlights them all. If the tile is highlighted while you have selected a character, then you can move to it. Most of the movement/attack options are based around if the tile is highlighted or not.
+
 ## Preparation
 
 Before we actually take a step into the game development, here are something you should do to get ready!
