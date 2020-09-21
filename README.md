@@ -12,7 +12,7 @@ Before we actually take a step into the game development, here are something you
 
 1. Download and install UnityHub from https://unity3d.com/get-unity/download. Be aware that UnityHub is not the **Unity3D GameEngine**, it is a software that helps you download and organize your projects and engines of different versions.
 2. Download Unity 2019.1.8f1 (make sure you have correct version number!). We will use this version of the engine to develop our games. There is no restrictions on what modules you should install.
-3. Download GitHub desktop from https://desktop.github.com/. We will mainly use GitHub as our version control system. If you do not have a GitHub account, please sign up. If you have troubles dealig with GitHub, you can always discord me anytime.
+3. Download GitHub desktop from https://desktop.github.com/. We will mainly use GitHub as our version control system. If you do not have a GitHub account, please sign up. If you have troubles dealing with GitHub, you can always discord me anytime.
 4. The base project is here https://github.com/awc71403/tilegame_partyproject. Make sure you have forked the project (ATTENTION: Please do FORK instead of CLONE).
 
 ## An Intro to Unity:
