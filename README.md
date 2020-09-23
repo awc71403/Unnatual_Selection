@@ -1,6 +1,6 @@
 # Tile-Based Party - Fall 2020 
 
-DONT PANIC AND MAKE GAMES !!!
+Strategy games are superior!
 
 # About the Base Project
 
