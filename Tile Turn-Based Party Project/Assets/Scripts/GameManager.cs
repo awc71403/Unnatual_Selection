@@ -28,6 +28,8 @@ public class GameManager : MonoBehaviour
 
     GameObject[,] mapArray;
         float tileSize;
+
+    GameObject m_tilesObject;
     #endregion
 
     #region Initialization
@@ -56,6 +58,9 @@ public class GameManager : MonoBehaviour
 
     #region Set Up
     public void CreateTiles() {
+
+        m_tilesObject = new GameObject();
+        m_tilesObject.name = "Tiles";
 
         string[] mapData = ReadLevelText();
 
@@ -87,6 +92,9 @@ public class GameManager : MonoBehaviour
 
         // Creates a new tile instance.
         GameObject newTile = Instantiate(tilePrefabs[tileIndex]);
+
+        //Put under tile object in Hierarchy
+        newTile.transform.SetParent(m_tilesObject.transform);
 
         // Calculates where it should go.
         float newX = worldStart.x + (tileSize * x);

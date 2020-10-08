@@ -22,17 +22,6 @@ public abstract class Character : MonoBehaviour {
     private Shader shaderGUItext;
     private Shader shaderSpritesDefault;
 
-    [SerializeField]
-    private Text DamageTextPrefab;
-    public Text damageText;
-
-    [SerializeField]
-    private Animator anim;
-
-    [SerializeField]
-    private AudioClip[] stepSounds;
-    private AudioSource audioSource;
-
     public abstract void TakeDamage(int damage, int stat);
     public abstract void Ability();
     public abstract void DisplayStats();
@@ -47,7 +36,6 @@ public abstract class Character : MonoBehaviour {
         myRenderer = gameObject.GetComponent<SpriteRenderer>();
         shaderGUItext = Shader.Find("GUI/Text Shader");
         shaderSpritesDefault = Shader.Find("Sprites/Default");
-        audioSource = GetComponent<AudioSource>();
         SetHPFull();
     }
     #endregion
@@ -151,23 +139,7 @@ public abstract class Character : MonoBehaviour {
         // Go white
         WhiteSprite();
 
-        //Create Damage Text
-        print("damage text created");
-        damageText = Instantiate(DamageTextPrefab);
-        Vector3 textPositionOffset = new Vector3(0, 1.25f, 0);
-        damageText.transform.position = Camera.main.WorldToScreenPoint(transform.position + textPositionOffset);
-        //damageText.GetComponent<DamageTextBehavior>().SetDamage(damage);
-
-        // Shaking
-        Vector3 defaultPosition = transform.position;
-        System.Random r = new System.Random();
-        for (int i = 0; i < 5; i++) {
-            double horizontalOffset = r.NextDouble() * 0.2 - 0.1f;
-            Vector3 vectorOffset = new Vector3((float)horizontalOffset, 0, 0);
-            transform.position += vectorOffset;
-            yield return new WaitForSeconds(0.025f);
-            transform.position = defaultPosition;
-        }
+        yield return new WaitForSeconds(0.1f);
 
         // Go normal
         NormalSprite();
@@ -205,11 +177,7 @@ public abstract class Character : MonoBehaviour {
         }
         transform.localScale = new Vector3(1, 1, 1);
 
-        // Play random step sound
-        System.Random r = new System.Random();
-        int stepNum = r.Next(0, stepSounds.Length);
-        //audioSource.clip = stepSounds[stepNum];
-        //audioSource.Play();
+        // Add sound
     }
     #endregion
 
