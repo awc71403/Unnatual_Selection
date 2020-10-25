@@ -21,12 +21,12 @@ public class GameManager : MonoBehaviour
     private GameObject[] tilePrefabs;
 
     [SerializeField]
-    GameObject testCharacter;
+    public GameObject testCharacter;
 
-    List<GameObject> player1Units;
-    List<GameObject> player2Units;
+    public List<GameObject> player1Units;
+    public List<GameObject> player2Units;
 
-    GameObject[,] mapArray;
+   public GameObject[,] mapArray;
         float tileSize;
 
     GameObject m_tilesObject;
