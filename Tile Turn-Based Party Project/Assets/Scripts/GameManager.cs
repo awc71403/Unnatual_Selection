@@ -11,11 +11,14 @@ public class GameManager : MonoBehaviour
         return m_Singleton;
     }
 
-    public static int currentPlayer = 1;
+    public static int currentPlayer = 2;
     public static bool actionInProcess;
 
     [SerializeField]
     private Button m_attackButton;
+
+    [SerializeField]
+    private Button SummonUI;
 
     [SerializeField]
     private GameObject[] tilePrefabs;
@@ -23,22 +26,21 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     GameObject testCharacter;
 
-    List<GameObject> player1Units;
-    List<GameObject> player2Units;
+    public static List<GameObject> player1Units; // changed to public static by Levana
+    public static List<GameObject> player2Units; // changed to public static by Levana
 
-    GameObject[,] mapArray;
+    public static GameObject[,] mapArray; // changed to public static by Levana
         float tileSize;
 
     GameObject m_tilesObject;
 
-    [SerializeField]
-    Button SummonUI;
+    
 
-    Character boughtUnit;
+    public static GameObject boughtUnit; // changed to public static by Levana
     #endregion
 
     #region Initialization
-    public Button GetSummonUI()
+    public Button GetSummonUI() // added by Levana for access in other classes
     {
         return SummonUI;
     }
@@ -55,6 +57,7 @@ public class GameManager : MonoBehaviour
         player2Units = new List<GameObject>();
 
         m_attackButton.onClick.AddListener(PressAttackButton);
+        GetSummonUI().onClick.AddListener(SummonClick); // ensures you can do something with summon button in SummonClick
 
         tileSize = tilePrefabs[0].GetComponent<SpriteRenderer>().sprite.bounds.size.x;
         CreateTiles();
@@ -63,17 +66,17 @@ public class GameManager : MonoBehaviour
     public void Start() {
         // FOR TESTING PURPOSES
         PlaceCharacterOnTile(testCharacter, 0, 1, 1);
-        SummonUI.gameObject.SetActive(false); //added by Levana for testing purposes. may remove if necessary
-        GetSummonUI().onClick.AddListener(TaskOnClick);
+        //added by Levana to test summoning tile behavior. may remove if necessary
+        SummonUI.gameObject.SetActive(false); // ensures summon button is closed at start. button only appears when Nexus is clicked
+        
     }
-    // added by Levana for testing purposes.
+    // added by Levana to test summoning tile behavior.
     // I wanted to make sure that the summon button appears when I click on a nexus tile
     // and disappears when I click on the summon button.
     // May change/remove if necessary.
-    public void TaskOnClick()
+    public void SummonClick()
     {
-        Debug.Log("Finished Summon");
-        SummonUnit();
+        SummonUnit(); // goes through the process to summon a unit
     }
     #endregion
 
@@ -136,7 +139,7 @@ public class GameManager : MonoBehaviour
         return data.Split('-');
     }
 
-    void PlaceCharacterOnTile(GameObject unit, int x, int y, int player) {
+    public static void PlaceCharacterOnTile(GameObject unit, int x, int y, int player) { // changed to public static by Levana
         // Instantiate an instance of the unit and place it on the given tile.
         GameObject newUnit = Instantiate(unit);
         newUnit.GetComponent<Character>().SetPlayer(player);
@@ -156,10 +159,17 @@ public class GameManager : MonoBehaviour
 
     #region UI
     // currently only summons a testCharacter as a bought unit
+    // Coded by Levana
     public void SummonUnit()
     {
-        boughtUnit = testCharacter.GetComponent<Character>();
+        boughtUnit = testCharacter;
+        // closes the Summon UI
         SummonUI.gameObject.SetActive(false);
+        // designates 1,1 to be the selectedTile (so that Levana can debug)
+        // for now, this will also be where the bought unit will go (which definitely isn't where it should actually go)
+        TileBehavior.SetSelectedTile(mapArray[1,1]);
+        TileBehavior.selectedTile.GetComponent<TileBehavior>().SelectionStateToSummon();
+
     }
     public void ShowCharacterUI(GameObject selectedUnit) {
     }
@@ -175,6 +185,14 @@ public class GameManager : MonoBehaviour
     }
 
     public void PressEndTurnButton() {
+        if (currentPlayer == 1)
+        {
+            currentPlayer = 2;
+        }
+        else
+        {
+            currentPlayer = 1;
+        }
         //For every character in Player 1, set can move and can attack.
         foreach (GameObject unit in player1Units) {
             unit.GetComponent<Character>().SetCanMove(true);

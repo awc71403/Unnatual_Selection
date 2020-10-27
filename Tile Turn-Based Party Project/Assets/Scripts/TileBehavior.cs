@@ -27,6 +27,9 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
     public int xPosition;
     public int yPosition;
     public string tileType;
+    // from GameManager.cs
+    GameObject[,] map = GameManager.mapArray;
+    int currentPlayer = GameManager.currentPlayer;
 
     [SerializeField]
     GameObject tileHighlighter;
@@ -92,7 +95,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
         return yPosition;
     }
 
-    public void SetSelectedTile(GameObject unit) {
+    public static void SetSelectedTile(GameObject unit) {
         selectedTile = unit;
     }
     #endregion
@@ -164,6 +167,15 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
         setHighlightOpacity(playerOpacity);
     }
 
+    public void HighlightCanSummon()
+    {
+        tileHighlighterAnimator.SetBool("canAttack", true);// there's not yet a color for summoning
+        tileHighlighterAnimator.SetBool("canMove", false);
+        tileHighlighterAnimator.SetBool("selected", false);
+        tileHighlighterAnimator.SetBool("enemySelected", false);
+        highlighted = true;
+        setHighlightOpacity(playerOpacity);
+    }
     public void HighlightSelected() {
         tileHighlighterAnimator.SetBool("canAttack", false);
         tileHighlighterAnimator.SetBool("canMove", false);
@@ -171,7 +183,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
         tileHighlighterAnimator.SetBool("enemySelected", false);
         setHighlightOpacity(playerOpacity);
     }
-
+   
     public void Dehighlight() {
         tileHighlighterAnimator.SetBool("canAttack", false);
         tileHighlighterAnimator.SetBool("canMove", false);
@@ -259,6 +271,31 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
 
 
 
+    }
+
+    // based on HighlightMoveableTiles code 
+    // no enemySelect
+    void HighlightSummoningTiles(int player)
+    {
+        // if player 1 is summoning, highlight the leftmost column
+        if (player == 1)
+        {
+            for (int i = 0; i < map.GetLength(1); i++)
+            {
+                highlightedTiles.Add(map[0,i]);
+                map[0, i].GetComponent<TileBehavior>().HighlightCanSummon();
+            }
+            
+        }
+        // if player 2 is summoning, highlight the rightmost column
+        else
+        {
+            for (int i = 0; i < map.GetLength(1); i++)
+            {
+                highlightedTiles.Add(map[map.GetLength(0) - 1, i]);
+                map[map.GetLength(0) - 1, i].GetComponent<TileBehavior>().HighlightCanSummon();
+            }
+        }
     }
     #endregion
 
@@ -375,12 +412,23 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
                         SelectionStateToEnemySelect();
                     }
                 }
-
                 // and this tile does not have a unit on it...
                 else {
                     // Dehighlight everything.
                     SelectionStateToNull();
                 }
+            }
+            // and selection state is summon...
+            else if (selectionState.Equals("summon"))
+            {
+                // place a summoned/bought unit on selectedTile tile
+                GameManager.PlaceCharacterOnTile(GameManager.boughtUnit, 
+                    selectedTile.GetComponent<TileBehavior>().xPosition,
+                    selectedTile.GetComponent<TileBehavior>().xPosition, 
+                    currentPlayer);
+
+                // Dehighlight everything.
+                SelectionStateToNull();
             }
         }
     }
@@ -403,7 +451,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
         selectedUnit = myUnit;
         selectedTile = gameObject;
         HighlightSelected();
-
+        
         // Open the Character UI
         GameManager.GetSingleton().ShowCharacterUI(selectedUnit);
 
@@ -430,6 +478,24 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
 
         //Highlight attackable tiles
         selectedTile.transform.GetComponent<TileBehavior>().HighlightAttackableTiles(selectedUnit);
+    }
+
+    // initially copied from SSTAttack code
+    public void SelectionStateToSummon()
+    {
+        // Deselect everything else
+        Deselect();
+
+        // Switch selection state to move
+        selectionState = "summon";
+
+        // Select this tile (maybe not its unit)
+        //selectedUnit = myUnit; // doesnt seem to be any use so far
+        selectedTile = gameObject;
+        HighlightSelected();
+
+        //Highlight summonable tiles
+        selectedTile.transform.GetComponent<TileBehavior>().HighlightSummoningTiles(currentPlayer);
     }
 
     public void SelectionStateToEnemySelect() {
@@ -624,4 +690,5 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
         return null;
     }
     #endregion
+
 }
