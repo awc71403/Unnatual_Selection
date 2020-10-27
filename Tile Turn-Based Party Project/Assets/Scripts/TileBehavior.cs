@@ -263,7 +263,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
     #endregion
 
     #region Selection Functions
-    public void OnPointerClick(PointerEventData data) {
+    public virtual void OnPointerClick(PointerEventData data) {
         //Condition where pointer click fails
         if (GameManager.actionInProcess) {
             return;

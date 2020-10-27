@@ -30,9 +30,19 @@ public class GameManager : MonoBehaviour
         float tileSize;
 
     GameObject m_tilesObject;
+
+    [SerializeField]
+    Button SummonUI;
+
+    Character boughtUnit;
     #endregion
 
     #region Initialization
+    public Button GetSummonUI()
+    {
+        return SummonUI;
+    }
+
     public void Awake() {
         // Singleton makes sure there is only one of this object
         if (m_Singleton != null) {
@@ -53,6 +63,17 @@ public class GameManager : MonoBehaviour
     public void Start() {
         // FOR TESTING PURPOSES
         PlaceCharacterOnTile(testCharacter, 0, 1, 1);
+        SummonUI.gameObject.SetActive(false); //added by Levana for testing purposes. may remove if necessary
+        GetSummonUI().onClick.AddListener(TaskOnClick);
+    }
+    // added by Levana for testing purposes.
+    // I wanted to make sure that the summon button appears when I click on a nexus tile
+    // and disappears when I click on the summon button.
+    // May change/remove if necessary.
+    public void TaskOnClick()
+    {
+        Debug.Log("Finished Summon");
+        SummonUnit();
     }
     #endregion
 
@@ -134,6 +155,12 @@ public class GameManager : MonoBehaviour
     #endregion
 
     #region UI
+    // currently only summons a testCharacter as a bought unit
+    public void SummonUnit()
+    {
+        boughtUnit = testCharacter.GetComponent<Character>();
+        SummonUI.gameObject.SetActive(false);
+    }
     public void ShowCharacterUI(GameObject selectedUnit) {
     }
 
