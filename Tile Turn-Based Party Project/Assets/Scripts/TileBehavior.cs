@@ -264,6 +264,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
             return;
         }
         if (tileType != "nexus" && myUnit == null) {
+            //Change to something else once we have the code/art
             HighlightCanMove();
         }
         highlightedTiles.Add(gameObject);
@@ -286,21 +287,20 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
         if (GameManager.actionInProcess) {
             return;
         }
-        Debug.Log("Base OnPointerClick");
         // If nothing is currently selected...
         if (selectionState == null) {
+            // and if the tile is your Nexus
             if (tileType == "nexus" && playerside == GameManager.currentPlayer) {
-                Debug.Log("Clicked on your nexus tile");
                 SelectionStateToSummon();
             }
-            // and this tile has a unit on it...
-            if (myUnit != null) {
+            // else if this tile has a unit on it...
+            else if (myUnit != null) {
                 // and the unit's player is equal to to the current player...
                 if (GameManager.currentPlayer.Equals(myUnit.GetComponent<Character>().GetPlayer())) {
                     // select that unit/tile and highlight the tiles that the unit can move to (if it can move).
                     SelectionStateToMove();
                 }
-                // ad the unit's player is equal to the enemy player...
+                // and the unit's player is equal to the enemy player...
                 else {
                     SelectionStateToEnemySelect();
                 }

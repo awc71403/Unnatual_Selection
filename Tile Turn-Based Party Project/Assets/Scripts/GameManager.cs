@@ -168,6 +168,8 @@ public class GameManager : MonoBehaviour
     }
 
     public void ExitSummonPanel() {
+        //Unhighlight everything
+        TileBehavior.Deselect();
         boughtUnit = null;
         SummonPanel.gameObject.SetActive(false);
     }
