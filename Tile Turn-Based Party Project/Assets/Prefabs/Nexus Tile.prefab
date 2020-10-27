@@ -31,7 +31,6 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 118056570043132853}
-  - {fileID: 1000509346005476828}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -127,58 +126,8 @@ MonoBehaviour:
   yPosition: 0
   tileType: 
   tileHighlighter: {fileID: 8503450720064362353}
-  playerOpacity: 0
-  enemyOpacity: 0
---- !u!1 &1000509346005476830
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1000509346005476828}
-  - component: {fileID: 1000509346005476829}
-  m_Layer: 0
-  m_Name: NexusScript
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1000509346005476828
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1000509346005476830}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 323.31622, y: 136.28682, z: 0.092036135}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_Children: []
-  m_Father: {fileID: 8703209047218399118}
-  m_RootOrder: 1
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1000509346005476829
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1000509346005476830}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cb2cd97879653bd48b616b7cc43c087f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  movementCost: 1
-  xPosition: 0
-  yPosition: 0
-  tileType: 
-  tileHighlighter: {fileID: 8503450720064362353}
-  playerOpacity: 0
-  enemyOpacity: 0
+  playerOpacity: 0.5
+  enemyOpacity: 0.5
 --- !u!1 &8503450720064362353
 GameObject:
   m_ObjectHideFlags: 0

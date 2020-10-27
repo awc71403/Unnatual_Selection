@@ -31,18 +31,12 @@ public class GameManager : MonoBehaviour
 
     GameObject m_tilesObject;
 
-    [SerializeField]
-    Button SummonUI;
+    public Image SummonPanel;
 
-    Character boughtUnit;
+    public GameObject boughtUnit;
     #endregion
 
     #region Initialization
-    public Button GetSummonUI()
-    {
-        return SummonUI;
-    }
-
     public void Awake() {
         // Singleton makes sure there is only one of this object
         if (m_Singleton != null) {
@@ -62,18 +56,7 @@ public class GameManager : MonoBehaviour
 
     public void Start() {
         // FOR TESTING PURPOSES
-        PlaceCharacterOnTile(testCharacter, 0, 1, 1);
-        SummonUI.gameObject.SetActive(false); //added by Levana for testing purposes. may remove if necessary
-        GetSummonUI().onClick.AddListener(TaskOnClick);
-    }
-    // added by Levana for testing purposes.
-    // I wanted to make sure that the summon button appears when I click on a nexus tile
-    // and disappears when I click on the summon button.
-    // May change/remove if necessary.
-    public void TaskOnClick()
-    {
-        Debug.Log("Finished Summon");
-        SummonUnit();
+        PlaceCharacterOnTile(testCharacter, 0, 1, 1, false);
     }
     #endregion
 
@@ -103,6 +86,18 @@ public class GameManager : MonoBehaviour
             char[] newTiles = mapData[y].ToCharArray();
             for (int x = 0; x < mapXSize; x++) {
                 PlaceTile(newTiles[x].ToString(), x, y, worldStart);
+            }
+        }
+
+        for (int y = 0; y < mapYSize; y++) {
+            Nexus player1side = mapArray[0, y].GetComponent<Nexus>();
+            Nexus player2side = mapArray[mapXSize - 1, y].GetComponent<Nexus>();
+
+            if (player1side) {
+                player1side.playerside = 1;
+            }
+            if (player2side) {
+                player2side.playerside = 2;
             }
         }
     }
@@ -136,12 +131,17 @@ public class GameManager : MonoBehaviour
         return data.Split('-');
     }
 
-    void PlaceCharacterOnTile(GameObject unit, int x, int y, int player) {
+    public void PlaceCharacterOnTile(GameObject unit, int x, int y, int player, bool exhausted = true) {
         // Instantiate an instance of the unit and place it on the given tile.
         GameObject newUnit = Instantiate(unit);
         newUnit.GetComponent<Character>().SetPlayer(player);
         newUnit.GetComponent<Character>().SetHPFull();
         mapArray[x, y].transform.GetComponent<TileBehavior>().PlaceUnit(newUnit);
+
+        if (exhausted) {
+            newUnit.GetComponent<Character>().SetCanMove(false);
+            newUnit.GetComponent<Character>().SetCanAttack(false);
+        }
 
         // Put the unit in the right player's array.
         if (player == 1) {
@@ -156,11 +156,22 @@ public class GameManager : MonoBehaviour
 
     #region UI
     // currently only summons a testCharacter as a bought unit
-    public void SummonUnit()
-    {
-        boughtUnit = testCharacter.GetComponent<Character>();
-        SummonUI.gameObject.SetActive(false);
+    public void SummonUnit() {
+        //Needs edit later when we implement all the faction units to generalize
+        boughtUnit = testCharacter;
     }
+
+    public void ConfirmSummonPanel() {
+        if (boughtUnit != null) {
+            SummonPanel.gameObject.SetActive(false);
+        }
+    }
+
+    public void ExitSummonPanel() {
+        boughtUnit = null;
+        SummonPanel.gameObject.SetActive(false);
+    }
+
     public void ShowCharacterUI(GameObject selectedUnit) {
     }
 

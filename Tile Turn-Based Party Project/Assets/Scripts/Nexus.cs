@@ -6,9 +6,12 @@ using UnityEngine.EventSystems;
 public class Nexus : TileBehavior
 {
     // Start is called before the first frame update
-    void Start()
-    {
-        Debug.Log("Successful Initialization");
+    private int nexusmovement = 999;
+
+    void Awake() {
+        base.Awake();
+        movementCost = nexusmovement;
+        tileType = "nexus";
     }
 
     // Update is called once per frame
@@ -17,9 +20,11 @@ public class Nexus : TileBehavior
         
     }
 
-    public override void OnPointerClick(PointerEventData data)
-    {
-        GameManager.GetSingleton().GetSummonUI().gameObject.SetActive(true);
-        Debug.Log("Opened Summon UI");
+    public override void OnPointerClick(PointerEventData data) {
+        base.OnPointerClick(data);
+
+        if (playerside == GameManager.currentPlayer) {
+            GameManager.GetSingleton().SummonPanel.gameObject.SetActive(true);
+        }
     }
 }

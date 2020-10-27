@@ -9,7 +9,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
     static List<GameObject> highlightedTiles = new List<GameObject>();
     public static GameObject selectedUnit;
     public static GameObject selectedTile;
-    static string selectionState;
+    protected static string selectionState;
     #endregion
 
     #region UI Variables    
@@ -27,6 +27,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
     public int xPosition;
     public int yPosition;
     public string tileType;
+    public int playerside;
 
     [SerializeField]
     GameObject tileHighlighter;
@@ -38,7 +39,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
     #endregion
 
     #region Initialization
-    void Awake() {
+    public void Awake() {
         tileHighlighter.transform.position = transform.position;
         tileHighlighterAnimator = tileHighlighter.GetComponent<Animator>();
         setHighlightOpacity(playerOpacity);
@@ -185,7 +186,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
     #region Highlight Valid Tiles Functions
     void HighlightMoveableTiles(int moveEnergy, bool enemySelect = false) {
         // Don't do anything if you've run out of energy.
-        if (moveEnergy < 0 || tileType == "wall") {
+        if (moveEnergy < 0 || tileType == "wall" || tileType == "nexus") {
             return;
         }
 
@@ -245,7 +246,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
                         }
                     }
                     // If that tile is a wall...
-                    else if (hit.gameObject.GetComponent<TileBehavior>().tileType == "wall") {
+                    else if (hit.gameObject.GetComponent<TileBehavior>().tileType == "wall" || hit.gameObject.GetComponent<TileBehavior>().tileType == "nexus") {
                         // Stop. Do not pass Go. Do not collect 200 dollars.
                         break;
                     }
@@ -256,9 +257,26 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
                 }
             }
         }
+    }
 
-
-
+    void HighlightSummonableTiles() {
+        if (highlightedTiles.Contains(gameObject)) {
+            return;
+        }
+        if (tileType != "nexus" && myUnit == null) {
+            HighlightCanMove();
+        }
+        highlightedTiles.Add(gameObject);
+        Vector2[] directions = { Vector2.right, Vector2.left, Vector2.up, Vector2.down };
+        foreach (Vector2 direction in directions) {
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, 1.0f);
+            if (hit.collider != null) {
+                TileBehavior otherTile = hit.transform.GetComponent<TileBehavior>();
+                if (otherTile.tileType == "nexus" && tileType == "nexus" || tileType == "nexus") {
+                    hit.transform.GetComponent<TileBehavior>().HighlightSummonableTiles();
+                }
+            }
+        }
     }
     #endregion
 
@@ -268,9 +286,13 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
         if (GameManager.actionInProcess) {
             return;
         }
-
+        Debug.Log("Base OnPointerClick");
         // If nothing is currently selected...
         if (selectionState == null) {
+            if (tileType == "nexus" && playerside == GameManager.currentPlayer) {
+                Debug.Log("Clicked on your nexus tile");
+                SelectionStateToSummon();
+            }
             // and this tile has a unit on it...
             if (myUnit != null) {
                 // and the unit's player is equal to to the current player...
@@ -382,6 +404,13 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
                     SelectionStateToNull();
                 }
             }
+            // and selection state is summoning...
+            else if (selectionState == "summoning") {
+                if (highlighted && tileType != "nexus") {
+                    GameManager.GetSingleton().PlaceCharacterOnTile(GameManager.GetSingleton().boughtUnit, xPosition, yPosition, GameManager.currentPlayer);
+                    SelectionStateToNull();
+                }
+            }
         }
     }
     #endregion
@@ -390,6 +419,18 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
     public void SelectionStateToNull() {
         // Deselect everything else
         Deselect();
+    }
+
+    public void SelectionStateToSummon() {
+        // Deselect everything else
+        Deselect();
+
+        // Switch selection state to summon
+        selectionState = "summoning";
+
+        // Select this tile
+        selectedTile = gameObject;
+        HighlightSummonableTiles();
     }
 
     public void SelectionStateToMove() {
@@ -479,7 +520,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
         foreach (GameObject highlightedTile in highlightedTiles) {
             highlightedTile.transform.GetComponent<TileBehavior>().Dehighlight();
         }
-
+        Debug.Log("Finished ");
         // Clear the list of highlighted tiles
         highlightedTiles.Clear();
 
