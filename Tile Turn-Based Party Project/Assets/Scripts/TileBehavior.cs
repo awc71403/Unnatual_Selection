@@ -319,6 +319,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
                 if (highlighted && myUnit == null) {
                     // move that character onto this tile and dehighlight everything.
                     selectedTile.GetComponent<TileBehavior>().ClearUnit();
+                    // attack here
                     StartCoroutine(MoveUnitToThisTile(selectedUnit, selectedTile));
                 }
 
@@ -346,6 +347,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
             }
             // and selection state is attack...
             else if (selectionState.Equals("attack")) {
+                selectedUnit.GetComponent<Character>().SetCanAttack(false);
                 // and the selected character can attack there...
                 if (highlighted && myUnit != null && myUnit.GetComponent<Character>().GetPlayer() != selectedUnit.GetComponent<Character>().GetPlayer()) {
                     // (Attack), and deselect everything.
@@ -520,7 +522,6 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
         foreach (GameObject highlightedTile in highlightedTiles) {
             highlightedTile.transform.GetComponent<TileBehavior>().Dehighlight();
         }
-        Debug.Log("Finished ");
         // Clear the list of highlighted tiles
         highlightedTiles.Clear();
 
@@ -607,6 +608,8 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
 
         // Action over!
         GameManager.actionInProcess = false;
+        gameObject.GetComponent<TileBehavior>().SelectionStateToAttack();
+        
     }
 
     // Recursive helper function to calculate the steps to take to get from tile A to tile B
