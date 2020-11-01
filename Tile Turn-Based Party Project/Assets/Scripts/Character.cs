@@ -18,10 +18,11 @@ public abstract class Character : MonoBehaviour {
     public int currentHealth;
     public int positionx;
     public int positiony;
+    public int distmoved;
 
     public int player;
 
-    private bool canMove = true;
+    public bool canMove = true;
     private bool canAttack = true;
 
     public GameObject occupiedTile;
@@ -33,6 +34,7 @@ public abstract class Character : MonoBehaviour {
 
     public abstract void TakeDamage(int damage);
     public abstract void Ability();
+    public abstract List<GameObject> getadjacent(TileBehavior tile);
     public abstract void DisplayStats();
     public abstract List<int[,]> GetAttackRange();
     public abstract void TileToXY(TileBehavior tile);

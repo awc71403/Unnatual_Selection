@@ -27,6 +27,49 @@ public class TestClass : Character
 
     }
 
+    public override List<GameObject> getadjacent(TileBehavior tile)
+    {
+        List<GameObject> retunitlist = new List<GameObject>();
+        int thisx = tile.GetComponent<TileBehavior>().xPosition;
+        int thisy = tile.GetComponent<TileBehavior>().yPosition;
+        if (thisy > 0) {
+            int[,] up = new int[thisx, thisy - 1];
+            GameObject unit = GameManager.GetSingleton().mapArray[thisx, thisy - 1].GetComponent<TileBehavior>().myUnit;
+            if (unit != null)
+            {
+                retunitlist.Add(unit);
+            }
+        }
+        if (thisy < 12)
+        {
+            int[,] down = new int[thisx, thisy + 1];
+            GameObject unit = GameManager.GetSingleton().mapArray[thisx, thisy + 1].GetComponent<TileBehavior>().myUnit;
+            if (unit != null)
+            {
+                retunitlist.Add(unit);
+            }
+        }
+        if (thisx > 0)
+        {
+            int[,] left = new int[thisx - 1, thisy];
+            GameObject unit = GameManager.GetSingleton().mapArray[thisx - 1, thisy].GetComponent<TileBehavior>().myUnit;
+            if (unit != null)
+            {
+                retunitlist.Add(unit);
+            }
+        }
+        if (thisx < 18)
+        {
+            int[,] right = new int[thisx + 1, thisy];
+            GameObject unit = GameManager.GetSingleton().mapArray[thisx + 1, thisy].GetComponent<TileBehavior>().myUnit;
+            if (unit != null)
+            {
+                retunitlist.Add(unit);
+            }
+        }
+        return retunitlist;
+    }
+
     public override void TileToXY(TileBehavior tile)
     {
         positionx = tile.GetComponent<TileBehavior>().xPosition;
@@ -66,7 +109,7 @@ public class TestClass : Character
     public override List<int[,]> GetAttackRange()
     {
         List<int[,]> retlist = new List<int[,]>();
-        foreach(GameObject tile in GameObject.Find("GameManager").GetComponent<GameManager>().mapArray)
+        foreach(GameObject tile in GameManager.GetSingleton().mapArray)
         {
             int tilex = tile.GetComponent<TileBehavior>().xPosition;
             int tiley = tile.GetComponent<TileBehavior>().yPosition;
@@ -88,12 +131,67 @@ public class TestClass : Character
     public override void attack(GameObject target)
     {
         //TODO: implement this
-        target.GetComponent<TestClass>().TakeDamage(damage);
-        if(cName == "Grunt")
+        TileBehavior targettile = target.GetComponent<TestClass>().occupiedTile.GetComponent<TileBehavior>();
+        int curdmg = damage;
+        if (cName == "Grunt")
         {
             //implement grunt adjacency checks, tbh idk how to do this yet
-        } else if (cName == "Beetle")
+            List<GameObject> adjacentlist = getadjacent(targettile);
+            curdmg = -1;
+            foreach (GameObject unit in adjacentlist)
+            {
+                if (unit.GetComponent<TestClass>().faction == "insect")
+                {
+                    curdmg += 1;
+                }
+            }
+        }
+        if (cName == "Grasshopper")
         {
+            if (distmoved == 4 && canMove == false)
+            {
+                curdmg = 4;
+            }
+        }
+        target.GetComponent<TestClass>().TakeDamage(curdmg);
+        if (cName == "Beetle")
+        {
+            if (targettile.xPosition > positionx)
+            {
+                int place = positionx - 1;
+                if (GameManager.GetSingleton().mapArray[place, positiony].GetComponent<TileBehavior>().myUnit == null)
+                {
+                    GameManager.GetSingleton().mapArray[place, positiony].GetComponent<TileBehavior>().PlaceUnit(target);
+                    targettile.ClearUnit();
+                }
+            }
+            else if (targettile.xPosition < positionx)
+            {
+                int place = positionx + 1;
+                if (GameManager.GetSingleton().mapArray[place, positiony].GetComponent<TileBehavior>().myUnit == null)
+                {
+                    GameManager.GetSingleton().mapArray[place, positiony].GetComponent<TileBehavior>().PlaceUnit(target);
+                    targettile.ClearUnit();
+                }
+            }
+            else if (targettile.yPosition > positiony)
+            {
+                int place = positiony - 1;
+                if (GameManager.GetSingleton().mapArray[positionx, place].GetComponent<TileBehavior>().myUnit == null)
+                {
+                    GameManager.GetSingleton().mapArray[positionx, place].GetComponent<TileBehavior>().PlaceUnit(target);
+                    targettile.ClearUnit();
+                }
+            }
+            if (targettile.yPosition < positiony)
+            {
+                int place = positiony + 1;
+                if (GameManager.GetSingleton().mapArray[place, positiony].GetComponent<TileBehavior>().myUnit == null)
+                {
+                    GameManager.GetSingleton().mapArray[positionx, place].GetComponent<TileBehavior>().PlaceUnit(target);
+                    targettile.ClearUnit();
+                }
+            }
             //check if square opposite of beetle is open
             //set position of the target to the spot behind beetle
         }
