@@ -79,6 +79,10 @@ public class TestClass : Character
     public override void TakeDamage(int damage)
     {
         currentHealth -= damage;
+        if(currentHealth <= 0)
+        {
+            ondeathhandler();
+        }
     }
 
 
@@ -124,7 +128,7 @@ public class TestClass : Character
     {
         if(currentHealth <= 0)
         {
-            GameObject.Find("GameManager").GetComponent<GameManager>().player1Units.Remove(this.gameObject);
+            GameManager.GetSingleton().player1Units.Remove(this.gameObject);
         }
     }
 
