@@ -22,7 +22,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
 
     #region Instance Variables
     bool highlighted;
-    GameObject myUnit;
+    public GameObject myUnit;
     public int movementCost = 1;
     public int xPosition;
     public int yPosition;
@@ -583,7 +583,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
 
         // Calculate the steps you need to take
         int unitPlayer = unit.GetComponent<Character>().player;
-        List<string> movementSteps = CalculateMovement(new List<string>(), originalTile, gameObject, unit.GetComponent<Character>().GetSpeed(), unitPlayer);
+        List<string> movementSteps = CalculateMovement(new List<string>(), originalTile, gameObject, unit.GetComponent<Character>().GetMovement(), unitPlayer);
 
         //Take those steps!
         foreach (string step in movementSteps) {
@@ -605,6 +605,9 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
         }
         PlaceUnit(unit);
         unit.GetComponent<Character>().SetCanMove(false);
+        int total = 0;
+        total += Mathf.Abs(xPosition - originalTile.GetComponent<TileBehavior>().xPosition) + Mathf.Abs(yPosition - originalTile.GetComponent<TileBehavior>().yPosition);
+        unit.GetComponent<TestClass>().distmoved = total;
 
         // Action over!
         GameManager.actionInProcess = false;

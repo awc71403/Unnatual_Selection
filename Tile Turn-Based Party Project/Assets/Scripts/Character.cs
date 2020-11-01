@@ -5,14 +5,24 @@ using UnityEngine.UI;
 
 public abstract class Character : MonoBehaviour {
 
-    public int[] curStatArr;
+    //public int[] curStatArr;
+    public int maxrange;
+    public int minrange;
+    public int damage;
+    public int movement;
+    public int initialmovement;
     protected string cName;
+    public string faction;
+    public int cost;
     public int totalHealth;
     public int currentHealth;
+    public int positionx;
+    public int positiony;
+    public int distmoved;
 
     public int player;
 
-    private bool canMove = true;
+    public bool canMove = true;
     private bool canAttack = true;
 
     public GameObject occupiedTile;
@@ -22,10 +32,17 @@ public abstract class Character : MonoBehaviour {
     private Shader shaderGUItext;
     private Shader shaderSpritesDefault;
 
-    public abstract void TakeDamage(int damage, int stat);
+    public abstract void TakeDamage(int damage);
     public abstract void Ability();
+    public abstract List<GameObject> getadjacent(TileBehavior tile);
     public abstract void DisplayStats();
     public abstract List<int[,]> GetAttackRange();
+    public abstract void TileToXY(TileBehavior tile);
+    public abstract bool IsInRange(int targetx, int targety);
+    //public abstract bool IsInMoveRange(int targetx, int targety);
+    public abstract void ondeathhandler();
+    public abstract void attack(GameObject target);
+    //public abstract void move(int targetx, int targety);
 
     // Movement Bounce Animation
     float totalStretch = 0.3f;
@@ -53,28 +70,28 @@ public abstract class Character : MonoBehaviour {
         currentHealth = totalHealth;
     }
 
-    public int[] GetCopyStats() {
-        int[] copy = new int[curStatArr.Length];
-        for (int i = 0; i < curStatArr.Length; i++) {
-            copy[i] = curStatArr[i];
-        }
-        return copy;
-    }
+    //public int[] GetCopyStats() {
+     //   int[] copy = new int[curStatArr.Length];
+    //    for (int i = 0; i < curStatArr.Length; i++) {
+   //         copy[i] = curStatArr[i];
+    //    }
+     //   return copy;
+   // }
 
-    public void ModifyStats(int[] stats) {
+    /*public void ModifyStats(int[] stats) {
         if (stats.Length == curStatArr.Length) {
             for (int i = 0; i < stats.Length; i++) {
                 curStatArr[i] = stats[i];
             }
         }
+    }*/
+
+    public virtual int GetAtk() {
+        return damage;
     }
 
-    public virtual int GetMight() {
-        return curStatArr[0];
-    }
-
-    public int GetSpeed() {
-        return curStatArr[1];
+    public int GetMovement() {
+        return movement;
     }
 
     public bool GetCanMove() {
@@ -98,6 +115,11 @@ public abstract class Character : MonoBehaviour {
         else if (canAttackBool == false) {
             GetComponent<Renderer>().material.color = Color.grey;
         }
+    }
+
+    public void SetMovement(int value)
+    {
+        movement = value;
     }
 
     public void SetPlayer(int playerNumber) {
