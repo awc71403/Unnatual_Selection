@@ -29,7 +29,10 @@ public class GameManager : MonoBehaviour
     public int player1Energy;
     public int player2Energy;
 
-   public GameObject[,] mapArray;
+    public int player1ObjectivePoints;
+    public int player2ObjectivePoints;
+
+    public GameObject[,] mapArray;
         float tileSize;
 
     GameObject m_tilesObject;
@@ -50,9 +53,11 @@ public class GameManager : MonoBehaviour
 
         player1Units = new List<GameObject>();
         player1Energy = 0;
+        player1ObjectivePoints = 0;
 
         player2Units = new List<GameObject>();
         player2Energy = 0;
+        player2ObjectivePoints = 0;
 
         tileSize = tilePrefabs[0].GetComponent<SpriteRenderer>().sprite.bounds.size.x;
         CreateTiles();
@@ -223,6 +228,17 @@ public class GameManager : MonoBehaviour
         }
         endButton.gameObject.SetActive(true);
         boughtUnit = null;
+    }
+
+    public void AddNexusObjectivePoints()
+    {
+        if (currentPlayer == 1) { 
+            player1ObjectivePoints += 20;
+        }
+        else {
+            player2ObjectivePoints += 20;
+        }
+        Debug.Log(player2ObjectivePoints);
     }
     #endregion
 }
