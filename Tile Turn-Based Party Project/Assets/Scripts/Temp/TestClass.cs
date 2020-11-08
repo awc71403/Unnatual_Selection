@@ -13,8 +13,8 @@ public class TestClass : Character
         totalHealth = 35;
         currentHealth = totalHealth;
         damage = 1; //placeholder replace for every unit type
-        movement = 1;
-        maxrange = 1;
+        movement = 2;
+        maxrange = 2;
         minrange = 1;
         cost = 1;
         initialmovement = 1;
@@ -109,17 +109,16 @@ public class TestClass : Character
             return false;
         }
     }
-
+    
     public override List<int[,]> GetAttackRange()
     {
         List<int[,]> retlist = new List<int[,]>();
-        foreach(GameObject tile in GameManager.GetSingleton().mapArray)
-        {
-            int tilex = tile.GetComponent<TileBehavior>().xPosition;
-            int tiley = tile.GetComponent<TileBehavior>().yPosition;
-            if (IsInRange(tilex, tiley))
-            {
-                retlist.Add(new int[tilex, tiley]);
+        for(int x = -maxrange; x <= maxrange; x++) {
+            for (int y = -maxrange; y <= maxrange; y++) {
+                if (Mathf.Abs(x) + Mathf.Abs(y) >= minrange && Mathf.Abs(x) + Mathf.Abs(y) <= maxrange) {
+                    int[,] inRange = {{x, y }};
+                    retlist.Add(inRange);
+                }
             }
         }
         return retlist;

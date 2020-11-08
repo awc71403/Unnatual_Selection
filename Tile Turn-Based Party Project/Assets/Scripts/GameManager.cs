@@ -15,7 +15,7 @@ public class GameManager : MonoBehaviour
     public static bool actionInProcess;
 
     [SerializeField]
-    private Button m_attackButton;
+    public Button endButton;
 
     [SerializeField]
     private GameObject[] tilePrefabs;
@@ -25,6 +25,9 @@ public class GameManager : MonoBehaviour
 
     public List<GameObject> player1Units;
     public List<GameObject> player2Units;
+
+    public int player1Energy;
+    public int player2Energy;
 
    public GameObject[,] mapArray;
         float tileSize;
@@ -46,9 +49,10 @@ public class GameManager : MonoBehaviour
         m_Singleton = this;
 
         player1Units = new List<GameObject>();
-        player2Units = new List<GameObject>();
+        player1Energy = 0;
 
-        m_attackButton.onClick.AddListener(PressAttackButton);
+        player2Units = new List<GameObject>();
+        player2Energy = 0;
 
         tileSize = tilePrefabs[0].GetComponent<SpriteRenderer>().sprite.bounds.size.x;
         CreateTiles();
@@ -56,7 +60,8 @@ public class GameManager : MonoBehaviour
 
     public void Start() {
         // FOR TESTING PURPOSES
-        PlaceCharacterOnTile(testCharacter, 0, 1, 1, false);
+        PlaceCharacterOnTile(testCharacter, 4, 4, 1, false);
+        PlaceCharacterOnTile(testCharacter, 5, 1, 2, false);
     }
     #endregion
 
@@ -158,6 +163,7 @@ public class GameManager : MonoBehaviour
     // currently only summons a testCharacter as a bought unit
     public void SummonUnit() {
         //Needs edit later when we implement all the faction units to generalize
+        //Needs to check money but not subtract money yet
         boughtUnit = testCharacter;
     }
 
@@ -172,6 +178,8 @@ public class GameManager : MonoBehaviour
         TileBehavior.Deselect();
         boughtUnit = null;
         SummonPanel.gameObject.SetActive(false);
+
+        endButton.gameObject.SetActive(true);
     }
 
     public void ShowCharacterUI(GameObject selectedUnit) {
@@ -181,13 +189,13 @@ public class GameManager : MonoBehaviour
 
     }
 
-    public void PressAttackButton() {
-        if (TileBehavior.selectedUnit != null && TileBehavior.selectedUnit.GetComponent<Character>().GetCanAttack()) {
-            TileBehavior.AttackSelection();
-        }
-    }
-
     public void PressEndTurnButton() {
+        if (currentPlayer == 1) {
+            currentPlayer = 2;
+        } else {
+            currentPlayer = 1;
+        }
+
         //For every character in Player 1, set can move and can attack.
         foreach (GameObject unit in player1Units) {
             unit.GetComponent<Character>().SetCanMove(true);
@@ -202,6 +210,19 @@ public class GameManager : MonoBehaviour
         if (TileBehavior.GetSelectionState() != null) {
             TileBehavior.selectedTile.GetComponent<TileBehavior>().SelectionStateToNull();
         }
+    }
+    #endregion
+
+    #region Helper
+    public void SubtractCost() {
+        if (currentPlayer == 1) {
+            player1Energy -= boughtUnit.GetComponent<Character>().cost;
+        }
+        else {
+            player2Energy -= boughtUnit.GetComponent<Character>().cost;
+        }
+        endButton.gameObject.SetActive(true);
+        boughtUnit = null;
     }
     #endregion
 }

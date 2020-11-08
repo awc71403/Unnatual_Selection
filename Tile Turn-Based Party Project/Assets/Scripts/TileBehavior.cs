@@ -4,9 +4,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 
-public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
+public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler {
     #region Selection Variables
     static List<GameObject> highlightedTiles = new List<GameObject>();
+    static List<GameObject> moveableTiles = new List<GameObject>();
     public static GameObject selectedUnit;
     public static GameObject selectedTile;
     protected static string selectionState;
@@ -184,7 +185,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
     #endregion
 
     #region Highlight Valid Tiles Functions
-    void HighlightMoveableTiles(int moveEnergy, bool enemySelect = false) {
+    void HighlightMoveableTiles(int moveEnergy) {
         // Don't do anything if you've run out of energy.
         if (moveEnergy < 0 || tileType == "wall" || tileType == "nexus") {
             return;
@@ -192,10 +193,10 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
 
         //Otherwise, hightlight yourself...
         if (myUnit == null) {
-            HighlightCanMove(enemySelect);
+            HighlightCanMove();
         }
         else if (!myUnit.Equals(selectedUnit)) {
-            HighlightCanMoveCovered(enemySelect);
+            HighlightCanMoveCovered();
         }
         highlightedTiles.Add(gameObject);
 
@@ -207,7 +208,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
             if (hit.collider != null) {
                 TileBehavior otherTile = hit.transform.GetComponent<TileBehavior>();
                 if (otherTile.myUnit == null || otherTile.myUnit.GetComponent<Character>().player == selectedUnit.GetComponent<Character>().player) {
-                    hit.transform.GetComponent<TileBehavior>().HighlightMoveableTiles(moveEnergy - movementCost, enemySelect);
+                    hit.transform.GetComponent<TileBehavior>().HighlightMoveableTiles(moveEnergy - movementCost);
                 }
             }
         }
@@ -259,6 +260,66 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
         }
     }
 
+    void HighlightRange(int moveEnergy, int attackRange) {
+        HighlightRangeMovement(moveEnergy);
+        foreach (GameObject tileObject in moveableTiles) {
+            TileBehavior tile = tileObject.GetComponent<TileBehavior>();
+            tile.HighlightRangeAttack(attackRange);
+        }
+    }
+
+    void HighlightRangeMovement(int moveEnergy) {
+        // Don't do anything if you've run out of energy.
+        if (moveEnergy < 0 || tileType == "wall" || tileType == "nexus") {
+            return;
+        }
+
+        //Otherwise, hightlight yourself...
+        if (myUnit == null || myUnit.Equals(selectedUnit)) {
+            HighlightCanMove();
+            moveableTiles.Add(gameObject);
+        }
+        else {
+            HighlightCanMoveCovered();
+        }
+        highlightedTiles.Add(gameObject);
+
+        //...and all adjacent tiles (if they don't contain enemy units).
+
+        Vector2[] directions = { Vector2.right, Vector2.left, Vector2.up, Vector2.down };
+        foreach (Vector2 direction in directions) {
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, 1.0f);
+            if (hit.collider != null) {
+                TileBehavior otherTile = hit.transform.GetComponent<TileBehavior>();
+                if (otherTile.myUnit == null || otherTile.myUnit.GetComponent<Character>().player == selectedUnit.GetComponent<Character>().player) {
+                    hit.transform.GetComponent<TileBehavior>().HighlightRangeMovement(moveEnergy - movementCost);
+                }
+            }
+        }
+    }
+
+    void HighlightRangeAttack(int attackRange) {
+        if (attackRange < 0) {
+            return;
+        }
+
+        if (!moveableTiles.Contains(gameObject)) {
+            HighlightCanAttack();
+            highlightedTiles.Add(gameObject);
+        }
+
+        Vector2[] directions = { Vector2.right, Vector2.left, Vector2.up, Vector2.down };
+        foreach (Vector2 direction in directions) {
+            RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, 1.0f);
+            if (hit.collider != null) {
+                TileBehavior otherTile = hit.transform.GetComponent<TileBehavior>();
+                if (!moveableTiles.Contains(otherTile.gameObject) || !highlightedTiles.Contains(otherTile.gameObject)) {
+                    hit.transform.GetComponent<TileBehavior>().HighlightRangeAttack(attackRange - 1);
+                }
+            }
+        }
+    }
+
     void HighlightSummonableTiles() {
         if (highlightedTiles.Contains(gameObject)) {
             return;
@@ -289,20 +350,20 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
         }
         // If nothing is currently selected...
         if (selectionState == null) {
+            // and if it was a right click...
+            if (data.button == PointerEventData.InputButton.Right) {
+                Debug.Log($"This tile is a {tileType}");
+            }
             // and if the tile is your Nexus
-            if (tileType == "nexus" && playerside == GameManager.currentPlayer) {
+            else if (tileType == "nexus" && playerside == GameManager.currentPlayer) {
                 SelectionStateToSummon();
             }
             // else if this tile has a unit on it...
             else if (myUnit != null) {
                 // and the unit's player is equal to to the current player...
-                if (GameManager.currentPlayer.Equals(myUnit.GetComponent<Character>().GetPlayer())) {
+                if (GameManager.currentPlayer.Equals(myUnit.GetComponent<Character>().GetPlayer()) && myUnit.GetComponent<Character>().GetCanMove() == true) {
                     // select that unit/tile and highlight the tiles that the unit can move to (if it can move).
                     SelectionStateToMove();
-                }
-                // and the unit's player is equal to the enemy player...
-                else {
-                    SelectionStateToEnemySelect();
                 }
             }
 
@@ -315,6 +376,11 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
         else {
             // and selection state is move...
             if (selectionState.Equals("move")) {
+                // and if it was a right click...
+                if (data.button == PointerEventData.InputButton.Right) {
+                    SelectionStateToNull();
+                    return;
+                }
                 // and the selected character can move onto this tile...
                 if (highlighted && myUnit == null) {
                     // move that character onto this tile and dehighlight everything.
@@ -325,19 +391,14 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
 
                 // and you are the selectedTile...
                 else if (selectedTile.Equals(gameObject)) {
-                    Deselect();
-                    GameManager.GetSingleton().ClearUI();
-                }
-
-                // and the unit's player is equal to to the current player...
-                else if (myUnit != null && GameManager.currentPlayer.Equals(myUnit.GetComponent<Character>().GetPlayer())) {
-                    // select that unit/tile and highlight the tiles that the unit can move to (if it can move).
-                    SelectionStateToMove();
-                }
-                // and the unit's player is equal to the enemy player...
-                else if (myUnit != null && !GameManager.currentPlayer.Equals(myUnit.GetComponent<Character>().GetPlayer())) {
-                    // select that unit/tile and highlight the tiles that the unit can move to (if it can move).
-                    SelectionStateToEnemySelect();
+                    // and the selected unit can attack...
+                    if (selectedUnit.GetComponent<Character>().GetCanAttack() == true) {
+                        SelectionStateToAttack();
+                    }
+                    // and the selected unit can't attack...
+                    else {
+                        SelectionStateToNull();
+                    }
                 }
                 // and the selected character cannot move onto this tile...
                 else {
@@ -347,72 +408,58 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
             }
             // and selection state is attack...
             else if (selectionState.Equals("attack")) {
-                selectedUnit.GetComponent<Character>().SetCanAttack(false);
                 // and the selected character can attack there...
                 if (highlighted && myUnit != null && myUnit.GetComponent<Character>().GetPlayer() != selectedUnit.GetComponent<Character>().GetPlayer()) {
                     // (Attack), and deselect everything.
 
                     //ADD CODE FOR ATTACK
-
+                    selectedUnit.GetComponent<Character>().SetCanMove(false);
+                    selectedUnit.GetComponent<Character>().SetCanAttack(false);
                     SelectionStateToNull();
 
                 }
-
-                // and the unit's player is equal to to the current player...
-                else if (myUnit != null && GameManager.currentPlayer.Equals(myUnit.GetComponent<Character>().GetPlayer())) {
-                    // select that unit/tile and highlight the tiles that the unit can move to (if it can move).
-                    SelectionStateToMove();
-                }
-
-                // and the unit's player is equal to the enemy player...
-                else if (myUnit != null && !GameManager.currentPlayer.Equals(myUnit.GetComponent<Character>().GetPlayer())) {
-                    // select that unit/tile and highlight the tiles that the unit can move to (if it can move).
-                    SelectionStateToEnemySelect();
-                }
-
-                // and the selected character cannot attack there...
-                else {
-                    // Dehighlight everything.
-                    SelectionStateToNull();
-                }
-            }
-            // and selection state is enemy select...
-            else if (selectionState == "enemySelect" || selectionState == "enemySelectAttack") {
-                // and this tile has a unit on it...
-                if (myUnit != null) {
-                    // and the unit's player is equal to to the current player...
-                    if (GameManager.currentPlayer.Equals(myUnit.GetComponent<Character>().GetPlayer())) {
-                        // select that unit/tile and highlight the tiles that the unit can move to (if it can move).
-                        SelectionStateToMove();
-                    }
-
-                    // and you are the selectedTile...
-                    else if (selectedTile.Equals(gameObject)) {
-                        Deselect();
-                        //NEEDS EDIT
-                        GameManager.GetSingleton().ClearUI();
-                    }
-
-                    // and the unit's player is equal to the enemy player...
-                    else if (myUnit != null && !GameManager.currentPlayer.Equals(myUnit.GetComponent<Character>().GetPlayer())) {
-                        // select that unit/tile and highlight the tiles that the unit can move to (if it can move).
-                        SelectionStateToEnemySelect();
-                    }
-                }
-
-                // and this tile does not have a unit on it...
-                else {
-                    // Dehighlight everything.
+                // and you are the selectedTile...
+                else if (selectedTile.Equals(gameObject)) {
+                    selectedUnit.GetComponent<Character>().SetCanMove(false);
+                    selectedUnit.GetComponent<Character>().SetCanAttack(false);
                     SelectionStateToNull();
                 }
             }
             // and selection state is summoning...
             else if (selectionState == "summoning") {
-                if (highlighted && tileType != "nexus") {
-                    GameManager.GetSingleton().PlaceCharacterOnTile(GameManager.GetSingleton().boughtUnit, xPosition, yPosition, GameManager.currentPlayer);
+                GameManager gameManager = GameManager.GetSingleton();
+                // and ifit was a right click...
+                if (data.button == PointerEventData.InputButton.Right) {
+                    gameManager.ExitSummonPanel();
+                    SelectionStateToNull();
+                }
+                // and if it was a left click...
+                else if (highlighted && tileType != "nexus") {
+                    gameManager.PlaceCharacterOnTile(GameManager.GetSingleton().boughtUnit, xPosition, yPosition, GameManager.currentPlayer);
+                    gameManager.SubtractCost();
                     SelectionStateToNull();
                 }
             }
+        }
+    }
+
+    public virtual void OnPointerDown(PointerEventData data) {
+
+        if (myUnit != null && data.button == PointerEventData.InputButton.Left) {
+            if (selectionState == null) {
+                if (!GameManager.currentPlayer.Equals(myUnit.GetComponent<Character>().GetPlayer()) || (!myUnit.GetComponent<Character>().GetCanMove() && !myUnit.GetComponent<Character>().GetCanAttack())) {
+                    //Highlight
+                    SelectionStateToCheckRange();
+                }
+            }
+        }
+    }
+
+    public virtual void OnPointerUp(PointerEventData data) {
+        // Needs to be changed
+        if (selectionState == "checkRange") {
+            Unhighlight();
+            selectionState = null;
         }
     }
     #endregion
@@ -426,6 +473,9 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
     public void SelectionStateToSummon() {
         // Deselect everything else
         Deselect();
+
+        GameManager gameManager = GameManager.GetSingleton();
+        gameManager.endButton.gameObject.SetActive(false);
 
         // Switch selection state to summon
         selectionState = "summoning";
@@ -452,7 +502,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
 
         // Highlight moveable tiles
         if (selectedUnit.GetComponent<Character>().GetCanMove()) {
-            HighlightMoveableTiles(selectedUnit.GetComponent<Character>().GetSpeed());
+            HighlightMoveableTiles(selectedUnit.GetComponent<Character>().GetMovement());
         }
     }
 
@@ -475,55 +525,26 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
         selectedTile.transform.GetComponent<TileBehavior>().HighlightAttackableTiles(selectedUnit);
     }
 
-    public void SelectionStateToEnemySelect() {
+    public void SelectionStateToCheckRange() {
         // Deselect everything else
         Deselect();
 
         // Switch selection state to move
-        selectionState = "enemySelect";
+        selectionState = "checkRange";
 
         // Select this tile and its unit
         selectedUnit = myUnit;
         selectedTile = gameObject;
-        HighlightSelected();
+        HighlightCanMove();
 
-        // Open the Character UI
-        GameManager.GetSingleton().ShowCharacterUI(selectedUnit);
-
-        // Highlight moveable tiles
-        if (selectedUnit.GetComponent<Character>().GetCanMove()) {
-            HighlightMoveableTiles(selectedUnit.GetComponent<Character>().GetSpeed(), true);
-        }
-    }
-
-    public void SelectionStateToEnemySelectAttack() {
-        // Deselect everything else
-        Deselect();
-
-        // Switch selection state to move
-        selectionState = "enemySelectAttack";
-
-        // Select this tile and its unit
-        selectedUnit = myUnit;
-        selectedTile = gameObject;
-        HighlightSelected();
-
-        // Open the Character UI
-        GameManager.GetSingleton().ShowCharacterUI(selectedUnit);
-
-        //Highlight attackable tiles
-        selectedTile.transform.GetComponent<TileBehavior>().HighlightAttackableTiles(selectedUnit, true);
+        //Highlight range
+        HighlightRange(myUnit.GetComponent<Character>().movement, myUnit.GetComponent<Character>().maxrange);
     }
     #endregion
 
     #region Deselect
     public static void Deselect() {
-        // Dehighlight everything
-        foreach (GameObject highlightedTile in highlightedTiles) {
-            highlightedTile.transform.GetComponent<TileBehavior>().Dehighlight();
-        }
-        // Clear the list of highlighted tiles
-        highlightedTiles.Clear();
+        Unhighlight();
 
         // Reset all selection variables
         selectedUnit = null;
@@ -536,38 +557,16 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler {
         //Get rid of all the UI
         GameManager.GetSingleton().ClearUI();
     }
-    #endregion
 
-    #region Attack Functions
-    public static void AttackSelection() {
-        // If selection state is move...
-        if (selectionState.Equals("move")) {
-            // and there is a selected character...
-            if (selectedUnit != null) {
-                selectedTile.GetComponent<TileBehavior>().SelectionStateToAttack();
-            }
+    public static void Unhighlight() {
+        // Dehighlight everything
+        foreach (GameObject highlightedTile in highlightedTiles) {
+            highlightedTile.transform.GetComponent<TileBehavior>().Dehighlight();
         }
-        // If selection state is attack...
-        else if (selectionState.Equals("attack")) {
-            // and there is a selected character...
-            if (selectedUnit != null) {
-                selectedTile.GetComponent<TileBehavior>().SelectionStateToMove();
-            }
-        }
-        // If selection state is enemySelect...
-        else if (selectionState.Equals("enemySelect")) {
-            // and there is a selected character...
-            if (selectedUnit != null) {
-                selectedTile.GetComponent<TileBehavior>().SelectionStateToEnemySelectAttack();
-            }
-        }
-        // If selection state is enemySelectAttack...
-        else if (selectionState.Equals("enemySelectAttack")) {
-            // and there is a selected character...
-            if (selectedUnit != null) {
-                selectedTile.GetComponent<TileBehavior>().SelectionStateToEnemySelect();
-            }
-        }
+        // Clear the list of highlighted tiles
+        highlightedTiles.Clear();
+        // Clear the list of moveable tiles
+        moveableTiles.Clear();
     }
     #endregion
 
