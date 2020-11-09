@@ -37,6 +37,8 @@ public class GameManager : MonoBehaviour
 
     GameObject m_tilesObject;
 
+    public CapturePoint capturePoint;
+
     public Image SummonPanel;
 
     public GameObject boughtUnit;
@@ -118,6 +120,9 @@ public class GameManager : MonoBehaviour
 
         // Creates a new tile instance.
         GameObject newTile = Instantiate(tilePrefabs[tileIndex]);
+        if (newTile.GetComponent<TileBehavior>().tileType == "capturepoint") {
+            capturePoint = newTile.GetComponent<CapturePoint>();
+        }
 
         //Put under tile object in Hierarchy
         newTile.transform.SetParent(m_tilesObject.transform);
@@ -216,6 +221,7 @@ public class GameManager : MonoBehaviour
             TileBehavior.selectedTile.GetComponent<TileBehavior>().SelectionStateToNull();
         }
         AddCTPObjectivePoints();
+        Debug.Log($"{player1ObjectivePoints}:{player2ObjectivePoints}");
     }
     #endregion
 
@@ -243,27 +249,13 @@ public class GameManager : MonoBehaviour
 
     public void AddCTPObjectivePoints()
     {
-        CapturePoint cp = mapArray[5, 3].GetComponent<CapturePoint>();
-        if (cp.myUnit != null && cp.unitAttacked) {
-            cp.turn = 0;
-            cp.unitAttacked = false;
-        } else if (cp.myUnit == null) {
-            cp.turn = 0;
-        } else {
-            cp.ownedBy = cp.myUnit.GetComponent<Character>().GetPlayer();
-            cp.turn += 1;
-        }
-
-        if (cp.turn > 2 && currentPlayer == cp.ownedBy) {
+        if (currentPlayer == capturePoint.ownedBy) {
             if (currentPlayer == 1) {
                 player1ObjectivePoints += 10;
             } else {
                 player2ObjectivePoints += 10;
             }
         }
-
-        Debug.Log(player1ObjectivePoints);
-        Debug.Log(player2ObjectivePoints);
     }
     #endregion
 }

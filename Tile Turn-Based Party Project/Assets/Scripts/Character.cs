@@ -23,7 +23,8 @@ public abstract class Character : MonoBehaviour {
     public int player;
 
     public bool canMove = true;
-    private bool canAttack = true;
+    public bool canAttack = true;
+    public bool attacked = false;
 
     public GameObject occupiedTile;
 

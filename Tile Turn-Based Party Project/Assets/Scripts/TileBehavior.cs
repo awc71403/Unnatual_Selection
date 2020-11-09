@@ -29,7 +29,6 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
     public int yPosition;
     public string tileType;
     public int playerside;
-    public bool unitAttacked;
 
     [SerializeField]
     GameObject tileHighlighter;
@@ -414,7 +413,9 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
                     // (Attack), and deselect everything.
 
                     //ADD CODE FOR ATTACK
-                    unitAttacked = true;
+                    if (tileType == "capturepoint") {
+                        myUnit.GetComponent<Character>().attacked = true;
+                    }
                     selectedUnit.GetComponent<Character>().SetCanMove(false);
                     selectedUnit.GetComponent<Character>().SetCanAttack(false);
                     SelectionStateToNull();
@@ -431,6 +432,9 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
                 }
                 // and you are the selectedTile...
                 else if (selectedTile.Equals(gameObject)) {
+                    if (tileType == "capturepoint") {
+                        gameObject.GetComponent<CapturePoint>().Capture();
+                    }
                     selectedUnit.GetComponent<Character>().SetCanMove(false);
                     selectedUnit.GetComponent<Character>().SetCanAttack(false);
                     SelectionStateToNull();
