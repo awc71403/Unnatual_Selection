@@ -29,6 +29,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
     public int yPosition;
     public string tileType;
     public int playerside;
+    public bool unitAttacked;
 
     [SerializeField]
     GameObject tileHighlighter;
@@ -247,7 +248,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
                         }
                     }
                     // If that tile is a wall...
-                    else if (hit.gameObject.GetComponent<TileBehavior>().tileType == "wall" || hit.gameObject.GetComponent<TileBehavior>().tileType == "nexus") {
+                    else if (hit.gameObject.GetComponent<TileBehavior>().tileType == "wall") {
                         // Stop. Do not pass Go. Do not collect 200 dollars.
                         break;
                     }
@@ -413,10 +414,20 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
                     // (Attack), and deselect everything.
 
                     //ADD CODE FOR ATTACK
+                    unitAttacked = true;
                     selectedUnit.GetComponent<Character>().SetCanMove(false);
                     selectedUnit.GetComponent<Character>().SetCanAttack(false);
                     SelectionStateToNull();
 
+                }
+                // and if the tile is the enemy's Nexus
+                else if (highlighted && tileType == "nexus" && playerside != GameManager.currentPlayer)
+                {
+                    GameManager gameManager = GameManager.GetSingleton();
+                    gameManager.AddNexusObjectivePoints();
+                    selectedUnit.GetComponent<Character>().SetCanMove(false);
+                    selectedUnit.GetComponent<Character>().SetCanAttack(false);
+                    SelectionStateToNull();
                 }
                 // and you are the selectedTile...
                 else if (selectedTile.Equals(gameObject)) {

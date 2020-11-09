@@ -29,7 +29,10 @@ public class GameManager : MonoBehaviour
     public int player1Energy;
     public int player2Energy;
 
-   public GameObject[,] mapArray;
+    public int player1ObjectivePoints;
+    public int player2ObjectivePoints;
+
+    public GameObject[,] mapArray;
         float tileSize;
 
     GameObject m_tilesObject;
@@ -50,9 +53,11 @@ public class GameManager : MonoBehaviour
 
         player1Units = new List<GameObject>();
         player1Energy = 0;
+        player1ObjectivePoints = 0;
 
         player2Units = new List<GameObject>();
         player2Energy = 0;
+        player2ObjectivePoints = 0;
 
         tileSize = tilePrefabs[0].GetComponent<SpriteRenderer>().sprite.bounds.size.x;
         CreateTiles();
@@ -210,6 +215,7 @@ public class GameManager : MonoBehaviour
         if (TileBehavior.GetSelectionState() != null) {
             TileBehavior.selectedTile.GetComponent<TileBehavior>().SelectionStateToNull();
         }
+        AddCTPObjectivePoints();
     }
     #endregion
 
@@ -223,6 +229,41 @@ public class GameManager : MonoBehaviour
         }
         endButton.gameObject.SetActive(true);
         boughtUnit = null;
+    }
+
+    public void AddNexusObjectivePoints()
+    {
+        if (currentPlayer == 1) { 
+            player1ObjectivePoints += 20;
+        }
+        else {
+            player2ObjectivePoints += 20;
+        }
+    }
+
+    public void AddCTPObjectivePoints()
+    {
+        CapturePoint cp = mapArray[5, 3].GetComponent<CapturePoint>();
+        if (cp.myUnit != null && cp.unitAttacked) {
+            cp.turn = 0;
+            cp.unitAttacked = false;
+        } else if (cp.myUnit == null) {
+            cp.turn = 0;
+        } else {
+            cp.ownedBy = cp.myUnit.GetComponent<Character>().GetPlayer();
+            cp.turn += 1;
+        }
+
+        if (cp.turn > 2 && currentPlayer == cp.ownedBy) {
+            if (currentPlayer == 1) {
+                player1ObjectivePoints += 10;
+            } else {
+                player2ObjectivePoints += 10;
+            }
+        }
+
+        Debug.Log(player1ObjectivePoints);
+        Debug.Log(player2ObjectivePoints);
     }
     #endregion
 }
