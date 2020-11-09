@@ -29,6 +29,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
     public int yPosition;
     public string tileType;
     public int playerside;
+    public bool unitAttacked;
 
     [SerializeField]
     GameObject tileHighlighter;
@@ -413,6 +414,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
                     // (Attack), and deselect everything.
 
                     //ADD CODE FOR ATTACK
+                    unitAttacked = true;
                     selectedUnit.GetComponent<Character>().SetCanMove(false);
                     selectedUnit.GetComponent<Character>().SetCanAttack(false);
                     SelectionStateToNull();

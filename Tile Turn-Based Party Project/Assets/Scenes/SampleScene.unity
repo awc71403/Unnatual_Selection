@@ -682,7 +682,7 @@ PrefabInstance:
     - target: {fileID: 7895661127649117891, guid: 9e597c282ab918c44be346392fc69fa1,
         type: 3}
       propertyPath: m_RootOrder
-      value: 2
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7895661127649117891, guid: 9e597c282ab918c44be346392fc69fa1,
         type: 3}
@@ -791,7 +791,7 @@ PrefabInstance:
     - target: {fileID: 4996835170940464041, guid: 8af7bc10483e94246b6f2656d5ea20cc,
         type: 3}
       propertyPath: tilePrefabs.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 4996835170940464041, guid: 8af7bc10483e94246b6f2656d5ea20cc,
         type: 3}
@@ -836,6 +836,12 @@ PrefabInstance:
       propertyPath: attackButton
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 4996835170940464041, guid: 8af7bc10483e94246b6f2656d5ea20cc,
+        type: 3}
+      propertyPath: tilePrefabs.Array.data[2]
+      value: 
+      objectReference: {fileID: 7458893458728638281, guid: 5390d4415e8a1114cbc97b68a198d4db,
+        type: 3}
     - target: {fileID: 4996835170940464040, guid: 8af7bc10483e94246b6f2656d5ea20cc,
         type: 3}
       propertyPath: m_LocalPosition.x

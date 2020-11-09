@@ -43,8 +43,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7c5d7878b6b956c4c8494beaca8cb594, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_attackButton: {fileID: 0}
+  endButton: {fileID: 0}
   tilePrefabs:
   - {fileID: 0}
   testCharacter: {fileID: 0}
-  SummonUI: {fileID: 0}
+  player1Units: []
+  player2Units: []
+  player1Energy: 0
+  player2Energy: 0
+  player1ObjectivePoints: 0
+  player2ObjectivePoints: 0
+  SummonPanel: {fileID: 0}
+  boughtUnit: {fileID: 0}

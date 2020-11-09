@@ -215,6 +215,7 @@ public class GameManager : MonoBehaviour
         if (TileBehavior.GetSelectionState() != null) {
             TileBehavior.selectedTile.GetComponent<TileBehavior>().SelectionStateToNull();
         }
+        AddCTPObjectivePoints();
     }
     #endregion
 
@@ -238,6 +239,30 @@ public class GameManager : MonoBehaviour
         else {
             player2ObjectivePoints += 20;
         }
+    }
+
+    public void AddCTPObjectivePoints()
+    {
+        CapturePoint cp = mapArray[5, 3].GetComponent<CapturePoint>();
+        if (cp.myUnit != null && cp.unitAttacked) {
+            cp.turn = 0;
+            cp.unitAttacked = false;
+        } else if (cp.myUnit == null) {
+            cp.turn = 0;
+        } else {
+            cp.ownedBy = cp.myUnit.GetComponent<Character>().GetPlayer();
+            cp.turn += 1;
+        }
+
+        if (cp.turn > 2 && currentPlayer == cp.ownedBy) {
+            if (currentPlayer == 1) {
+                player1ObjectivePoints += 10;
+            } else {
+                player2ObjectivePoints += 10;
+            }
+        }
+
+        Debug.Log(player1ObjectivePoints);
         Debug.Log(player2ObjectivePoints);
     }
     #endregion
