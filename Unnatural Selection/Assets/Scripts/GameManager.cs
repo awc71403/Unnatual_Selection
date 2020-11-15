@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
         return m_Singleton;
     }
 
-    public int currentPlayer = 1;
+    public static int currentPlayer = 1;
     public static bool actionInProcess;
 
     [SerializeField]
@@ -235,6 +235,11 @@ public class GameManager : MonoBehaviour
         }
         endButton.gameObject.SetActive(true);
         boughtUnit = null;
+    }
+
+    public int getCurrent()
+    {
+        return currentPlayer;
     }
 
     public void AddNexusObjectivePoints()

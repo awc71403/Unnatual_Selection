@@ -149,7 +149,7 @@ public class TestClass : Character
     {
         if(currentHealth <= 0)
         {
-            if(GameManager.GetSingleton().currentPlayer == 1)
+            if(GameManager.GetSingleton().getCurrent() == 1)
             {
                 GameManager.GetSingleton().player2ObjectivePoints += cost;
             } else
