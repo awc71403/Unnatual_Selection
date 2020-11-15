@@ -11,7 +11,7 @@ public class GameManager : MonoBehaviour
         return m_Singleton;
     }
 
-    public static int currentPlayer = 1;
+    public int currentPlayer = 1;
     public static bool actionInProcess;
 
     [SerializeField]
