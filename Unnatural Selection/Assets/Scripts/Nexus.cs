@@ -25,7 +25,7 @@ public class Nexus : TileBehavior
 
         if (playerside == GameManager.currentPlayer && data.button == PointerEventData.InputButton.Left) {
             // Make sure you can't click on tiles while buying a unit
-            GameManager.GetSingleton().SummonPanel.gameObject.SetActive(true);
+            GameManager.GetSingleton().OpenSummonPanel();
         }
     }
 }
