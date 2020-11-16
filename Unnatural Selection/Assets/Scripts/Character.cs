@@ -11,14 +11,17 @@ public abstract class Character : MonoBehaviour {
     public int damage;
     public int movement;
     public int initialmovement;
-    protected string cName;
-    public string faction;
     public int cost;
     public int totalHealth;
     public int currentHealth;
     public int positionx;
     public int positiony;
     public int distmoved;
+
+    public string unitName;
+    public string faction;
+    public string desc;
+    public Sprite sprite;
 
     public int player;
 
@@ -60,7 +63,7 @@ public abstract class Character : MonoBehaviour {
 
     #region Getter and Setter
     public string GetName() {
-        return cName;
+        return unitName;
     }
 
     public int GetHP() {

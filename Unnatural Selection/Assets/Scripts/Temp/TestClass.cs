@@ -19,7 +19,7 @@ public class TestClass : Character
         cost = 1;
         initialmovement = 1;
         //curStatArr = Stats;
-        cName = "Test";
+        unitName = "Test";
     }
 
     // Update is called once per frame
@@ -219,7 +219,7 @@ public class TestClass : Character
             }
         }
         target.GetComponent<TestClass>().TakeDamage(curdmg);
-        if (cName == "Beetle")
+        if (unitName == "Beetle")
         {
             if (targettile.xPosition > positionx)
             {
