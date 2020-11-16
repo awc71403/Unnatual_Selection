@@ -266,6 +266,11 @@ public class GameManager : MonoBehaviour
         boughtUnit = null;
     }
 
+    public int getCurrent()
+    {
+        return currentPlayer;
+    }
+
     public void AddNexusObjectivePoints()
     {
         if (currentPlayer == 1) { 

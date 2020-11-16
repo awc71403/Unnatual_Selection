@@ -78,7 +78,24 @@ public class TestClass : Character
 
     public override void TakeDamage(int damage)
     {
-        currentHealth -= damage;
+        bool lorge = false;
+        int dmgtaken = damage;
+        if(faction == "rock")
+        {
+            List<GameObject> adjacentlist = getadjacent(occupiedTile.GetComponent<TileBehavior>());
+            foreach (GameObject unit in adjacentlist)
+            {
+                if (unit.GetComponent<TestClass>().cName == "Bouldef")
+                {
+                    lorge = true;
+                }
+            }
+            if( lorge == true)
+            {
+                dmgtaken -= 1;
+            }
+        }
+        currentHealth -= dmgtaken;
         if(currentHealth <= 0)
         {
             ondeathhandler();
@@ -87,8 +104,13 @@ public class TestClass : Character
 
 
     public override void Ability() {
-        //TODO: wait on more info for now.
-        throw new System.NotImplementedException();
+        if( cName == "Upholder")
+        {
+            if(currentHealth < totalHealth)
+            {
+                currentHealth++;
+            }
+        }
     }
 
     public override void DisplayStats() {
@@ -127,6 +149,13 @@ public class TestClass : Character
     {
         if(currentHealth <= 0)
         {
+            if(GameManager.GetSingleton().getCurrent() == 1)
+            {
+                GameManager.GetSingleton().player2ObjectivePoints += cost;
+            } else
+            {
+                GameManager.GetSingleton().player1ObjectivePoints += cost;
+            }
             GameManager.GetSingleton().player1Units.Remove(this.gameObject);
         }
     }
@@ -136,7 +165,8 @@ public class TestClass : Character
         //TODO: implement this
         TileBehavior targettile = target.GetComponent<TestClass>().occupiedTile.GetComponent<TileBehavior>();
         int curdmg = damage;
-        if (unitName == "Grunt")
+        string targetname = target.GetComponent<TestClass>().cName;
+        if (cName == "Grunt")
         {
             //implement grunt adjacency checks, tbh idk how to do this yet
             List<GameObject> adjacentlist = getadjacent(targettile);
@@ -149,7 +179,39 @@ public class TestClass : Character
                 }
             }
         }
-        if (unitName == "Grasshopper")
+        if (cName == "Geowulf")
+        {
+            List<GameObject> adjacentlist = getadjacent(targettile);
+            foreach (GameObject unit in adjacentlist)
+            {
+                if (unit.GetComponent<TestClass>().faction != "rock")
+                {
+                    unit.GetComponent<TestClass>().TakeDamage(1);
+                }
+            }
+        }
+        if (cName == "Bouldef")
+        {
+            int dist = 0;
+            dist += Mathf.Abs(positionx - target.GetComponent<TestClass>().positionx);
+            dist += Mathf.Abs(positiony - target.GetComponent<TestClass>().positiony);
+            if (dist > 1)
+            {
+                curdmg -= 1;
+            }
+        }
+        if (cName == "Enforcer")
+        {
+            int dist = 0;
+            dist += Mathf.Abs(positionx - target.GetComponent<TestClass>().positionx);
+            dist += Mathf.Abs(positiony - target.GetComponent<TestClass>().positiony);
+            curdmg = dist + 1;
+            if( canMove == false)
+            {
+                Mathf.Floor(curdmg / 2);
+            }
+        }
+        if (cName == "Grasshopper")
         {
             if (distmoved == 4 && canMove == false)
             {
@@ -195,9 +257,14 @@ public class TestClass : Character
                     targettile.ClearUnit();
                 }
             }
+            if (targetname == "Stalmight")
+            {
+                TakeDamage(2);
+            }
             //check if square opposite of beetle is open
             //set position of the target to the spot behind beetle
         }
+       
     }
     /*public override List<int[,]> GetAttackRange() {
         int flipIfPlayer2 = 1;
