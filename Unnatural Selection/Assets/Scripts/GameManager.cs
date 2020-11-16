@@ -25,6 +25,8 @@ public class GameManager : MonoBehaviour
 
     public List<GameObject> player1Units;
     public List<GameObject> player2Units;
+    public GameObject[] player1Faction;
+    public GameObject[] player2Faction;
 
     public int player1Energy;
     public int player2Energy;
@@ -42,6 +44,8 @@ public class GameManager : MonoBehaviour
     public Image SummonPanel;
 
     public GameObject boughtUnit;
+
+    public UnitCollection unitCollection;
     #endregion
 
     #region Initialization
@@ -66,9 +70,9 @@ public class GameManager : MonoBehaviour
     }
 
     public void Start() {
-        // FOR TESTING PURPOSES
-        PlaceCharacterOnTile(testCharacter, 4, 4, 1, false);
-        PlaceCharacterOnTile(testCharacter, 5, 1, 2, false);
+        unitCollection = UnitCollection.GetSingleton();
+        player1Faction = unitCollection.FactionPicker(PlayerPrefs.GetInt("Player1Faction"));
+        player2Faction = unitCollection.FactionPicker(PlayerPrefs.GetInt("Player2Faction"));
     }
     #endregion
 
@@ -171,10 +175,35 @@ public class GameManager : MonoBehaviour
 
     #region UI
     // currently only summons a testCharacter as a bought unit
-    public void SummonUnit() {
+    public void SummonUnit(int picker) {
         //Needs edit later when we implement all the faction units to generalize
         //Needs to check money but not subtract money yet
-        boughtUnit = testCharacter;
+        if (currentPlayer == 1) {
+            boughtUnit = player1Faction[picker];
+        }
+        else {
+            boughtUnit = player2Faction[picker];
+        }
+    }
+
+    public void OpenSummonPanel() {
+        if (currentPlayer == 1) {
+            SummonPanel.gameObject.GetComponentsInChildren<Image>()[1].sprite = player1Faction[0].GetComponent<Character>().sprite;
+            SummonPanel.gameObject.GetComponentsInChildren<Image>()[2].sprite = player1Faction[1].GetComponent<Character>().sprite;
+            SummonPanel.gameObject.GetComponentsInChildren<Image>()[3].sprite = player1Faction[2].GetComponent<Character>().sprite;
+            SummonPanel.gameObject.GetComponentsInChildren<Text>()[0].text = player1Faction[0].GetComponent<Character>().name;
+            SummonPanel.gameObject.GetComponentsInChildren<Text>()[1].text = player1Faction[1].GetComponent<Character>().name;
+            SummonPanel.gameObject.GetComponentsInChildren<Text>()[2].text = player1Faction[2].GetComponent<Character>().name;
+        }
+        else {
+            SummonPanel.gameObject.GetComponentsInChildren<Image>()[1].sprite = player2Faction[0].GetComponent<Character>().sprite;
+            SummonPanel.gameObject.GetComponentsInChildren<Image>()[2].sprite = player2Faction[1].GetComponent<Character>().sprite;
+            SummonPanel.gameObject.GetComponentsInChildren<Image>()[3].sprite = player2Faction[2].GetComponent<Character>().sprite;
+            SummonPanel.gameObject.GetComponentsInChildren<Text>()[0].text = player2Faction[0].GetComponent<Character>().name;
+            SummonPanel.gameObject.GetComponentsInChildren<Text>()[1].text = player2Faction[1].GetComponent<Character>().name;
+            SummonPanel.gameObject.GetComponentsInChildren<Text>()[2].text = player2Faction[2].GetComponent<Character>().name;
+        }
+        SummonPanel.gameObject.SetActive(true);
     }
 
     public void ConfirmSummonPanel() {

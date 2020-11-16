@@ -19,7 +19,7 @@ public class TestClass : Character
         cost = 1;
         initialmovement = 1;
         //curStatArr = Stats;
-        cName = "Test";
+        unitName = "Test";
     }
 
     // Update is called once per frame
@@ -136,7 +136,7 @@ public class TestClass : Character
         //TODO: implement this
         TileBehavior targettile = target.GetComponent<TestClass>().occupiedTile.GetComponent<TileBehavior>();
         int curdmg = damage;
-        if (cName == "Grunt")
+        if (unitName == "Grunt")
         {
             //implement grunt adjacency checks, tbh idk how to do this yet
             List<GameObject> adjacentlist = getadjacent(targettile);
@@ -149,7 +149,7 @@ public class TestClass : Character
                 }
             }
         }
-        if (cName == "Grasshopper")
+        if (unitName == "Grasshopper")
         {
             if (distmoved == 4 && canMove == false)
             {
@@ -157,7 +157,7 @@ public class TestClass : Character
             }
         }
         target.GetComponent<TestClass>().TakeDamage(curdmg);
-        if (cName == "Beetle")
+        if (unitName == "Beetle")
         {
             if (targettile.xPosition > positionx)
             {
