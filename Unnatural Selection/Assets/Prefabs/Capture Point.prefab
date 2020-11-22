@@ -171,7 +171,7 @@ SpriteRenderer:
   m_SortingLayerID: 1948701599
   m_SortingLayer: 1
   m_SortingOrder: 0
-  m_Sprite: {fileID: 632811197452920695, guid: 064194efac18807428214c87bb650f30, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 76ea91d0f630aae4d951c40558305c20, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -226,9 +226,9 @@ MonoBehaviour:
   yPosition: 0
   tileType: 
   playerside: 0
-  unitAttacked: 0
   tileHighlighter: {fileID: 3427068516729363573}
   playerOpacity: 0.5
   enemyOpacity: 0.5
   ownedBy: 0
   turn: 0
+  unitOnPoint: {fileID: 0}
