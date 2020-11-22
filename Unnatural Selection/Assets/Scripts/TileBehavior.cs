@@ -349,10 +349,12 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
             return;
         }
         // If nothing is currently selected...
+        Debug.Log(selectionState);
         if (selectionState == null) {
             // and if it was a right click...
             if (data.button == PointerEventData.InputButton.Right) {
-                Debug.Log($"This tile is a {tileType}");
+                Debug.Log($"This tile is a {tileType} tile");
+                GameManager.GetSingleton().ShowCharacterUI(myUnit);
             }
             // and if the tile is your Nexus
             else if (tileType == "nexus" && playerside == GameManager.currentPlayer) {
@@ -360,6 +362,11 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
             }
             // else if this tile has a unit on it...
             else if (myUnit != null) {
+                // Right click for Unit Info (eg. stats)
+                //if (data.button == PointerEventData.InputButton.Right)
+                //{
+                //    GameManager.GetSingleton().ShowCharacterUI(myUnit);
+                //}
                 // and the unit's player is equal to to the current player...
                 if (GameManager.currentPlayer.Equals(myUnit.GetComponent<Character>().GetPlayer()) && myUnit.GetComponent<Character>().GetCanMove() == true) {
                     GameManager.GetSingleton().ShowCharacterUI(myUnit);

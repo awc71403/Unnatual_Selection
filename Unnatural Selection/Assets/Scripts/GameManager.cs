@@ -44,6 +44,8 @@ public class GameManager : MonoBehaviour
 
     public Image SummonPanel;
 
+    public Image CharacterUI;
+
     public GameObject boughtUnit;
 
     public UnitCollection unitCollection;
@@ -254,11 +256,15 @@ public class GameManager : MonoBehaviour
     }
 
     public void ShowCharacterUI(GameObject selectedUnit) {
+<<<<<<< Updated upstream
         unitUI.SetActive(true);
         Character unit = selectedUnit.GetComponent<Character>();
         unitName.text = unit.unitName;
         unitHP.text = $"HP: {unit.totalHealth.ToString()}";
         unitDMG.text = $"DMG: {unit.damage.ToString()}";
+=======
+        CharacterUI.gameObject.SetActive(true);
+>>>>>>> Stashed changes
     }
 
     public void UpdateUI() {
