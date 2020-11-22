@@ -10,16 +10,6 @@ public class TestClass : Character
 
 
     void Awake() {
-        totalHealth = 35;
-        currentHealth = totalHealth;
-        damage = 1; //placeholder replace for every unit type
-        movement = 2;
-        maxrange = 2;
-        minrange = 1;
-        cost = 1;
-        initialmovement = 1;
-        //curStatArr = Stats;
-        unitName = "Test";
     }
 
     // Update is called once per frame

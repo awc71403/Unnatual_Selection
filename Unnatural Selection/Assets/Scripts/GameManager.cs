@@ -12,6 +12,7 @@ public class GameManager : MonoBehaviour
     }
 
     public static int currentPlayer = 1;
+    public int turnCounter = 1;
     public static bool actionInProcess;
 
     [SerializeField]
@@ -46,6 +47,25 @@ public class GameManager : MonoBehaviour
     public GameObject boughtUnit;
 
     public UnitCollection unitCollection;
+
+    #region UI Variables
+    public Text turnText;
+    public Text currentFaction;
+
+    public GameObject unitUI;
+    public Text unitName;
+    public Text unitHP;
+    public Text unitDMG;
+
+    public Text player1EnergyText;
+    public Text player2EnergyText;
+
+    public Slider player1ObjSlider;
+    public Slider player2ObjSlider;
+
+    public Text player1ObjText;
+    public Text player2ObjText;
+    #endregion
     #endregion
 
     #region Initialization
@@ -58,7 +78,7 @@ public class GameManager : MonoBehaviour
         m_Singleton = this;
 
         player1Units = new List<GameObject>();
-        player1Energy = 0;
+        player1Energy = 10;
         player1ObjectivePoints = 0;
 
         player2Units = new List<GameObject>();
@@ -73,6 +93,8 @@ public class GameManager : MonoBehaviour
         unitCollection = UnitCollection.GetSingleton();
         player1Faction = unitCollection.FactionPicker(PlayerPrefs.GetInt("Player1Faction"));
         player2Faction = unitCollection.FactionPicker(PlayerPrefs.GetInt("Player2Faction"));
+
+        UpdateUI();
     }
     #endregion
 
@@ -179,10 +201,14 @@ public class GameManager : MonoBehaviour
         //Needs edit later when we implement all the faction units to generalize
         //Needs to check money but not subtract money yet
         if (currentPlayer == 1) {
-            boughtUnit = player1Faction[picker];
+            if (player1Energy >= player1Faction[picker].GetComponent<Character>().cost) {
+                boughtUnit = player1Faction[picker];
+            }
         }
         else {
-            boughtUnit = player2Faction[picker];
+            if (player2Energy >= player2Faction[picker].GetComponent<Character>().cost) {
+                boughtUnit = player2Faction[picker];
+            }
         }
     }
 
@@ -192,16 +218,22 @@ public class GameManager : MonoBehaviour
             SummonPanel.gameObject.GetComponentsInChildren<Image>()[2].sprite = player1Faction[1].GetComponent<Character>().sprite;
             SummonPanel.gameObject.GetComponentsInChildren<Image>()[3].sprite = player1Faction[2].GetComponent<Character>().sprite;
             SummonPanel.gameObject.GetComponentsInChildren<Text>()[0].text = player1Faction[0].GetComponent<Character>().name;
-            SummonPanel.gameObject.GetComponentsInChildren<Text>()[1].text = player1Faction[1].GetComponent<Character>().name;
-            SummonPanel.gameObject.GetComponentsInChildren<Text>()[2].text = player1Faction[2].GetComponent<Character>().name;
+            SummonPanel.gameObject.GetComponentsInChildren<Text>()[1].text = $"Cost: {player1Faction[0].GetComponent<Character>().cost}\n\nHP: {player1Faction[0].GetComponent<Character>().totalHealth}\nDMG: {player1Faction[0].GetComponent<Character>().damage}\n★: {player1Faction[0].GetComponent<Character>().ability}";
+            SummonPanel.gameObject.GetComponentsInChildren<Text>()[2].text = player1Faction[1].GetComponent<Character>().name;
+            SummonPanel.gameObject.GetComponentsInChildren<Text>()[3].text = $"Cost: {player1Faction[1].GetComponent<Character>().cost}\n\nHP: {player1Faction[1].GetComponent<Character>().totalHealth}\nDMG: {player1Faction[1].GetComponent<Character>().damage}\n★: {player1Faction[1].GetComponent<Character>().ability}";
+            SummonPanel.gameObject.GetComponentsInChildren<Text>()[4].text = player1Faction[2].GetComponent<Character>().name;
+            SummonPanel.gameObject.GetComponentsInChildren<Text>()[5].text = $"Cost: {player1Faction[2].GetComponent<Character>().cost}\n\nHP: {player1Faction[2].GetComponent<Character>().totalHealth}\nDMG: {player1Faction[2].GetComponent<Character>().damage}\n★: {player1Faction[2].GetComponent<Character>().ability}";
         }
         else {
             SummonPanel.gameObject.GetComponentsInChildren<Image>()[1].sprite = player2Faction[0].GetComponent<Character>().sprite;
             SummonPanel.gameObject.GetComponentsInChildren<Image>()[2].sprite = player2Faction[1].GetComponent<Character>().sprite;
             SummonPanel.gameObject.GetComponentsInChildren<Image>()[3].sprite = player2Faction[2].GetComponent<Character>().sprite;
             SummonPanel.gameObject.GetComponentsInChildren<Text>()[0].text = player2Faction[0].GetComponent<Character>().name;
-            SummonPanel.gameObject.GetComponentsInChildren<Text>()[1].text = player2Faction[1].GetComponent<Character>().name;
-            SummonPanel.gameObject.GetComponentsInChildren<Text>()[2].text = player2Faction[2].GetComponent<Character>().name;
+            SummonPanel.gameObject.GetComponentsInChildren<Text>()[1].text = $"Cost: {player2Faction[0].GetComponent<Character>().cost}\n\nHP: {player2Faction[0].GetComponent<Character>().totalHealth}\nDMG: {player2Faction[0].GetComponent<Character>().damage}\n★: {player2Faction[0].GetComponent<Character>().ability}";
+            SummonPanel.gameObject.GetComponentsInChildren<Text>()[2].text = player2Faction[1].GetComponent<Character>().name;
+            SummonPanel.gameObject.GetComponentsInChildren<Text>()[1].text = $"Cost: {player2Faction[1].GetComponent<Character>().cost}\n\nHP: {player2Faction[1].GetComponent<Character>().totalHealth}\nDMG: {player2Faction[1].GetComponent<Character>().damage}\n★: {player2Faction[1].GetComponent<Character>().ability}";
+            SummonPanel.gameObject.GetComponentsInChildren<Text>()[4].text = player2Faction[2].GetComponent<Character>().name;
+            SummonPanel.gameObject.GetComponentsInChildren<Text>()[1].text = $"Cost: {player2Faction[2].GetComponent<Character>().cost}\n\nHP: {player2Faction[2].GetComponent<Character>().totalHealth}\nDMG: {player2Faction[2].GetComponent<Character>().damage}\n★: {player2Faction[2].GetComponent<Character>().ability}";
         }
         SummonPanel.gameObject.SetActive(true);
     }
@@ -222,18 +254,39 @@ public class GameManager : MonoBehaviour
     }
 
     public void ShowCharacterUI(GameObject selectedUnit) {
+        unitUI.SetActive(true);
+        Character unit = selectedUnit.GetComponent<Character>();
+        unitName.text = unit.unitName;
+        unitHP.text = $"HP: {unit.totalHealth.ToString()}";
+        unitDMG.text = $"DMG: {unit.damage.ToString()}";
+    }
+
+    public void UpdateUI() {
+        if (currentPlayer == 1) {
+            player1EnergyText.text = $"Energy: {player1Energy.ToString()}";
+            currentFaction.text = $"{player1Faction[0].GetComponent<Character>().faction}'s Turn";
+        }
+        else {
+            player2EnergyText.text = $"Energy: {player2Energy.ToString()}";
+            currentFaction.text = $"{player2Faction[0].GetComponent<Character>().faction}'s Turn";
+        }
     }
 
     public void ClearUI() {
-
+        unitUI.SetActive(false);
     }
 
     public void PressEndTurnButton() {
         if (currentPlayer == 1) {
             currentPlayer = 2;
+            player2Energy += 10;
         } else {
             currentPlayer = 1;
+            player1Energy += 10;
+            turnCounter++;
+            turnText.text = $"Turn {turnCounter.ToString()}";
         }
+        UpdateUI();
 
         //For every character in Player 1, set can move and can attack.
         foreach (GameObject unit in player1Units) {
@@ -258,10 +311,12 @@ public class GameManager : MonoBehaviour
     public void SubtractCost() {
         if (currentPlayer == 1) {
             player1Energy -= boughtUnit.GetComponent<Character>().cost;
+
         }
         else {
             player2Energy -= boughtUnit.GetComponent<Character>().cost;
         }
+        UpdateUI();
         endButton.gameObject.SetActive(true);
         boughtUnit = null;
     }

@@ -5,6 +5,7 @@ using UnityEngine.UI;
 
 public abstract class Character : MonoBehaviour {
 
+    #region Variables
     //public int[] curStatArr;
     public int maxrange;
     public int minrange;
@@ -21,6 +22,7 @@ public abstract class Character : MonoBehaviour {
     public string unitName;
     public string faction;
     public string desc;
+    public string ability;
     public Sprite sprite;
 
     public int player;
@@ -36,6 +38,18 @@ public abstract class Character : MonoBehaviour {
     private Shader shaderGUItext;
     private Shader shaderSpritesDefault;
 
+    #region Extra
+    [SerializeField]
+    private AudioClip[] stepSounds;
+    private AudioSource audioSource;
+
+    // Movement Bounce Animation
+    float totalStretch = 0.3f;
+    float totalSquish = 0.3f;
+    #endregion
+    #endregion
+
+    #region Abstract
     public abstract void TakeDamage(int damage);
     public abstract void Ability();
     public abstract List<GameObject> getadjacent(TileBehavior tile);
@@ -47,16 +61,14 @@ public abstract class Character : MonoBehaviour {
     public abstract void ondeathhandler();
     public abstract void attack(GameObject target);
     //public abstract void move(int targetx, int targety);
-
-    // Movement Bounce Animation
-    float totalStretch = 0.3f;
-    float totalSquish = 0.3f;
+    #endregion
 
     #region Initialization
     void Start() {
         myRenderer = gameObject.GetComponent<SpriteRenderer>();
         shaderGUItext = Shader.Find("GUI/Text Shader");
         shaderSpritesDefault = Shader.Find("Sprites/Default");
+        audioSource = GetComponent<AudioSource>();
         SetHPFull();
     }
     #endregion
@@ -204,6 +216,12 @@ public abstract class Character : MonoBehaviour {
         transform.localScale = new Vector3(1, 1, 1);
 
         // Add sound
+        // Play random step sound
+        System.Random r = new System.Random();
+        int stepNum = r.Next(0, stepSounds.Length);
+        Debug.Log(stepNum);
+        audioSource.clip = stepSounds[stepNum];
+        audioSource.Play();
     }
     #endregion
 
