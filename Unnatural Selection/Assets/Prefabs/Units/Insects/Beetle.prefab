@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 4035052260592389509}
   - component: {fileID: 1545982694007899899}
   - component: {fileID: 564470197424420765}
+  - component: {fileID: 347447849385910394}
   m_Layer: 0
   m_Name: Beetle
   m_TagString: Untagged
@@ -97,6 +98,7 @@ MonoBehaviour:
   minrange: 1
   damage: 2
   movement: 3
+  initialmovement: 0
   cost: 6
   totalHealth: 12
   currentHealth: 12
@@ -106,12 +108,18 @@ MonoBehaviour:
   unitName: Beetle
   faction: Insect
   desc: I flip.
+  ability: Attacks flip enemies behind you if possible
   sprite: {fileID: 21300000, guid: ea8669220bfbb434dba790126c0bcba1, type: 3}
   player: 0
   canMove: 1
   canAttack: 1
   attacked: 0
   occupiedTile: {fileID: 0}
+  stepSounds:
+  - {fileID: 8300000, guid: 3025f3c3c48b1fd409fba15ff5462e40, type: 3}
+  - {fileID: 8300000, guid: dacb66efe3b525542aed415fd5dd4aa6, type: 3}
+  - {fileID: 8300000, guid: abc2afeb060d80542b6b27b96db59eee, type: 3}
+  - {fileID: 8300000, guid: c9f974bfea7f625469d5c02648e9fdec, type: 3}
 --- !u!95 &564470197424420765
 Animator:
   serializedVersion: 3
@@ -131,3 +139,99 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!82 &347447849385910394
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 171450269606497996}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4

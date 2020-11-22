@@ -7,6 +7,11 @@ using UnityEngine.UI;
 public class SelectionManager : MonoBehaviour
 {
     #region Variables
+    private static SelectionManager m_Singleton;
+    public static SelectionManager GetSingleton() {
+        return m_Singleton;
+    }
+
     [SerializeField]
     public Image firstUnit;
     [SerializeField]
@@ -19,8 +24,6 @@ public class SelectionManager : MonoBehaviour
     public Image player2Image;
     [SerializeField]
     public Text factionText;
-    [SerializeField]
-    public Button beginButton;
 
     public UnitCollection unitCollection;
 
@@ -34,6 +37,13 @@ public class SelectionManager : MonoBehaviour
 
     #region Initialization
     public void Awake() {
+        // Singleton makes sure there is only one of this object
+        if (m_Singleton != null) {
+            DestroyImmediate(gameObject);
+            return;
+        }
+        m_Singleton = this;
+
         currentFactionInt = 0;
         player1Faction = -1;
         player2Faction = -1;
@@ -44,12 +54,12 @@ public class SelectionManager : MonoBehaviour
         unitCollection = UnitCollection.GetSingleton();
         currentFaction = unitCollection.FactionPicker(currentFactionInt);
         LoadFaction();
+        UpdateFactionImage();
     }
     #endregion
 
     #region UI
     public void LoadFaction() {
-        Debug.Log(currentFactionInt);
         currentFaction = unitCollection.FactionPicker(currentFactionInt);
         factionText.text = currentFaction[0].GetComponent<Character>().faction;
         firstUnit.sprite = currentFaction[0].GetComponent<Character>().sprite;
@@ -60,22 +70,35 @@ public class SelectionManager : MonoBehaviour
         thirdUnit.gameObject.GetComponentInChildren<Text>().text = currentFaction[2].GetComponent<Character>().unitName;
     }
 
-    public void Confirm() {
-        if (beginButton.IsInteractable()) {
-            return;
-        }
+    public void UpdateFactionImage() {
         if (player1Faction == -1) {
-            player1Faction = currentFactionInt;
+            player1Image.enabled = true;
             player1Image.sprite = currentFaction[0].GetComponent<Character>().sprite;
             player1Image.gameObject.GetComponentInChildren<Text>().text = currentFaction[0].GetComponent<Character>().faction;
-            currentFactionInt++;
+        }
+        else {
+            player2Image.enabled = true;
+            player2Image.sprite = currentFaction[0].GetComponent<Character>().sprite;
+            player2Image.gameObject.GetComponentInChildren<Text>().text = currentFaction[0].GetComponent<Character>().faction;
+        }
+    }
+
+    public void Confirm() {
+        if (player1Faction == -1) {
+            player1Faction = currentFactionInt;
+            if (currentFactionInt == 0) {
+                currentFactionInt++;
+            }
+            else {
+                currentFactionInt--;
+            }
             LoadFaction();
+            UpdateFactionImage();
         }
         else {
             player2Faction = currentFactionInt;
-            player2Image.sprite = currentFaction[0].GetComponent<Character>().sprite;
-            player2Image.gameObject.GetComponentInChildren<Text>().text = currentFaction[0].GetComponent<Character>().faction;
-            beginButton.interactable = true;
+            UpdateFactionImage();
+            Begin();
         }
     }
 
@@ -83,47 +106,6 @@ public class SelectionManager : MonoBehaviour
         PlayerPrefs.SetInt("Player1Faction", player1Faction);
         PlayerPrefs.SetInt("Player2Faction", player2Faction);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
-    }
-
-    public void Left() {
-        if (currentFactionInt <= 0) {
-            return;
-        }
-        else {
-            if (player1Faction != -1) {
-                if (player1Faction == currentFactionInt - 1) {
-                    if (currentFactionInt - 2 <= 0) {
-                        return;
-                    }
-                    else {
-                        currentFactionInt--;
-                    }
-                }
-            }
-            currentFactionInt--;
-
-            LoadFaction();
-        }
-    }
-
-    public void Right() {
-        if (currentFactionInt >= 3) {
-            return;
-        }
-        else {
-            if (player1Faction != -1) {
-                if (player1Faction == currentFactionInt + 1) {
-                    if (currentFactionInt + 2 <= 0) {
-                        return;
-                    }
-                    else {
-                        currentFactionInt--;
-                    }
-                }
-            }
-            currentFactionInt++;
-            LoadFaction();
-        }
     }
 
     public void Back() {

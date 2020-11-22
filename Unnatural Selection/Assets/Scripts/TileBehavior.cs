@@ -362,6 +362,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
             else if (myUnit != null) {
                 // and the unit's player is equal to to the current player...
                 if (GameManager.currentPlayer.Equals(myUnit.GetComponent<Character>().GetPlayer()) && myUnit.GetComponent<Character>().GetCanMove() == true) {
+                    GameManager.GetSingleton().ShowCharacterUI(myUnit);
                     // select that unit/tile and highlight the tiles that the unit can move to (if it can move).
                     SelectionStateToMove();
                 }
