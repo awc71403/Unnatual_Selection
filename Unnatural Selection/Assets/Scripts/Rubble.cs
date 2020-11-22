@@ -2,17 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NewBehaviourScript : MonoBehaviour
+public class Rubble : TileBehavior
 {
-    // Start is called before the first frame update
-    void Start()
+    private int movement = 2;
+
+    void Awake()
     {
-        
+        base.Awake();
+        movementCost = movement;
+        tileType = "rubble";
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+
     }
 }

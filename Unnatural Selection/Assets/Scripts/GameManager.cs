@@ -44,6 +44,8 @@ public class GameManager : MonoBehaviour
 
     public Image SummonPanel;
 
+    public Image CharacterUI;
+
     public GameObject boughtUnit;
 
     public UnitCollection unitCollection;

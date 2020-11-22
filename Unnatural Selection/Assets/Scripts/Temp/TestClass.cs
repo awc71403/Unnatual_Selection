@@ -75,7 +75,7 @@ public class TestClass : Character
             List<GameObject> adjacentlist = getadjacent(occupiedTile.GetComponent<TileBehavior>());
             foreach (GameObject unit in adjacentlist)
             {
-                if (unit.GetComponent<TestClass>().cName == "Bouldef")
+                if (unit.GetComponent<TestClass>().unitName == "Bouldef")
                 {
                     lorge = true;
                 }
@@ -94,7 +94,7 @@ public class TestClass : Character
 
 
     public override void Ability() {
-        if( cName == "Upholder")
+        if(unitName == "Upholder")
         {
             if(currentHealth < totalHealth)
             {
@@ -155,8 +155,8 @@ public class TestClass : Character
         //TODO: implement this
         TileBehavior targettile = target.GetComponent<TestClass>().occupiedTile.GetComponent<TileBehavior>();
         int curdmg = damage;
-        string targetname = target.GetComponent<TestClass>().cName;
-        if (cName == "Grunt")
+        string targetname = target.GetComponent<TestClass>().unitName;
+        if (unitName == "Grunt")
         {
             //implement grunt adjacency checks, tbh idk how to do this yet
             List<GameObject> adjacentlist = getadjacent(targettile);
@@ -169,7 +169,7 @@ public class TestClass : Character
                 }
             }
         }
-        if (cName == "Geowulf")
+        if (unitName == "Geowulf")
         {
             List<GameObject> adjacentlist = getadjacent(targettile);
             foreach (GameObject unit in adjacentlist)
@@ -180,7 +180,7 @@ public class TestClass : Character
                 }
             }
         }
-        if (cName == "Bouldef")
+        if (unitName == "Bouldef")
         {
             int dist = 0;
             dist += Mathf.Abs(positionx - target.GetComponent<TestClass>().positionx);
@@ -190,7 +190,7 @@ public class TestClass : Character
                 curdmg -= 1;
             }
         }
-        if (cName == "Enforcer")
+        if (unitName == "Enforcer")
         {
             int dist = 0;
             dist += Mathf.Abs(positionx - target.GetComponent<TestClass>().positionx);
@@ -201,7 +201,7 @@ public class TestClass : Character
                 Mathf.Floor(curdmg / 2);
             }
         }
-        if (cName == "Grasshopper")
+        if (unitName == "Grasshopper")
         {
             if (distmoved == 4 && canMove == false)
             {
