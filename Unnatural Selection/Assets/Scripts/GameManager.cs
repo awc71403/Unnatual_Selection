@@ -36,7 +36,7 @@ public class GameManager : MonoBehaviour
     public int player2ObjectivePoints;
 
     public GameObject[,] mapArray;
-        float tileSize;
+    float tileSize;
 
     GameObject m_tilesObject;
 
@@ -147,6 +147,9 @@ public class GameManager : MonoBehaviour
         int tileIndex = int.Parse(tileType);
 
         // Creates a new tile instance.
+        if (tileIndex == 0 || tileIndex == 1 || tileIndex == 2) {
+            tileIndex = Random.Range(0, 2);
+        }
         GameObject newTile = Instantiate(tilePrefabs[tileIndex]);
         if (newTile.GetComponent<TileBehavior>().tileType == "capturepoint") {
             capturePoint = newTile.GetComponent<CapturePoint>();
@@ -220,22 +223,22 @@ public class GameManager : MonoBehaviour
             SummonPanel.gameObject.GetComponentsInChildren<Image>()[2].sprite = player1Faction[1].GetComponent<Character>().sprite;
             SummonPanel.gameObject.GetComponentsInChildren<Image>()[3].sprite = player1Faction[2].GetComponent<Character>().sprite;
             SummonPanel.gameObject.GetComponentsInChildren<Text>()[0].text = player1Faction[0].GetComponent<Character>().name;
-            SummonPanel.gameObject.GetComponentsInChildren<Text>()[1].text = $"Cost: {player1Faction[0].GetComponent<Character>().cost}\n\nHP: {player1Faction[0].GetComponent<Character>().totalHealth}\nDMG: {player1Faction[0].GetComponent<Character>().damage}\n★: {player1Faction[0].GetComponent<Character>().ability}";
+            SummonPanel.gameObject.GetComponentsInChildren<Text>()[1].text = $"Cost: {player1Faction[0].GetComponent<Character>().cost}\n\nHP: {player1Faction[0].GetComponent<Character>().totalHealth}\nDMG: {player1Faction[0].GetComponent<Character>().damage}\nSpeed: {player1Faction[0].GetComponent<Character>().movement}\n★: {player1Faction[0].GetComponent<Character>().ability}";
             SummonPanel.gameObject.GetComponentsInChildren<Text>()[2].text = player1Faction[1].GetComponent<Character>().name;
-            SummonPanel.gameObject.GetComponentsInChildren<Text>()[3].text = $"Cost: {player1Faction[1].GetComponent<Character>().cost}\n\nHP: {player1Faction[1].GetComponent<Character>().totalHealth}\nDMG: {player1Faction[1].GetComponent<Character>().damage}\n★: {player1Faction[1].GetComponent<Character>().ability}";
+            SummonPanel.gameObject.GetComponentsInChildren<Text>()[3].text = $"Cost: {player1Faction[1].GetComponent<Character>().cost}\n\nHP: {player1Faction[1].GetComponent<Character>().totalHealth}\nDMG: {player1Faction[1].GetComponent<Character>().damage}\nSpeed: {player1Faction[1].GetComponent<Character>().movement}\n★: {player1Faction[1].GetComponent<Character>().ability}";
             SummonPanel.gameObject.GetComponentsInChildren<Text>()[4].text = player1Faction[2].GetComponent<Character>().name;
-            SummonPanel.gameObject.GetComponentsInChildren<Text>()[5].text = $"Cost: {player1Faction[2].GetComponent<Character>().cost}\n\nHP: {player1Faction[2].GetComponent<Character>().totalHealth}\nDMG: {player1Faction[2].GetComponent<Character>().damage}\n★: {player1Faction[2].GetComponent<Character>().ability}";
+            SummonPanel.gameObject.GetComponentsInChildren<Text>()[5].text = $"Cost: {player1Faction[2].GetComponent<Character>().cost}\n\nHP: {player1Faction[2].GetComponent<Character>().totalHealth}\nDMG: {player1Faction[2].GetComponent<Character>().damage}\nSpeed: {player1Faction[2].GetComponent<Character>().movement}\n★: {player1Faction[2].GetComponent<Character>().ability}";
         }
         else {
             SummonPanel.gameObject.GetComponentsInChildren<Image>()[1].sprite = player2Faction[0].GetComponent<Character>().sprite;
             SummonPanel.gameObject.GetComponentsInChildren<Image>()[2].sprite = player2Faction[1].GetComponent<Character>().sprite;
             SummonPanel.gameObject.GetComponentsInChildren<Image>()[3].sprite = player2Faction[2].GetComponent<Character>().sprite;
             SummonPanel.gameObject.GetComponentsInChildren<Text>()[0].text = player2Faction[0].GetComponent<Character>().name;
-            SummonPanel.gameObject.GetComponentsInChildren<Text>()[1].text = $"Cost: {player2Faction[0].GetComponent<Character>().cost}\n\nHP: {player2Faction[0].GetComponent<Character>().totalHealth}\nDMG: {player2Faction[0].GetComponent<Character>().damage}\n★: {player2Faction[0].GetComponent<Character>().ability}";
+            SummonPanel.gameObject.GetComponentsInChildren<Text>()[1].text = $"Cost: {player2Faction[0].GetComponent<Character>().cost}\n\nHP: {player2Faction[0].GetComponent<Character>().totalHealth}\nDMG: {player2Faction[0].GetComponent<Character>().damage}\nSpeed: {player2Faction[0].GetComponent<Character>().movement}\n★: {player2Faction[0].GetComponent<Character>().ability}";
             SummonPanel.gameObject.GetComponentsInChildren<Text>()[2].text = player2Faction[1].GetComponent<Character>().name;
-            SummonPanel.gameObject.GetComponentsInChildren<Text>()[1].text = $"Cost: {player2Faction[1].GetComponent<Character>().cost}\n\nHP: {player2Faction[1].GetComponent<Character>().totalHealth}\nDMG: {player2Faction[1].GetComponent<Character>().damage}\n★: {player2Faction[1].GetComponent<Character>().ability}";
+            SummonPanel.gameObject.GetComponentsInChildren<Text>()[3].text = $"Cost: {player2Faction[1].GetComponent<Character>().cost}\n\nHP: {player2Faction[1].GetComponent<Character>().totalHealth}\nDMG: {player2Faction[1].GetComponent<Character>().damage}\nSpeed: {player2Faction[1].GetComponent<Character>().movement}\n★: {player2Faction[1].GetComponent<Character>().ability}";
             SummonPanel.gameObject.GetComponentsInChildren<Text>()[4].text = player2Faction[2].GetComponent<Character>().name;
-            SummonPanel.gameObject.GetComponentsInChildren<Text>()[1].text = $"Cost: {player2Faction[2].GetComponent<Character>().cost}\n\nHP: {player2Faction[2].GetComponent<Character>().totalHealth}\nDMG: {player2Faction[2].GetComponent<Character>().damage}\n★: {player2Faction[2].GetComponent<Character>().ability}";
+            SummonPanel.gameObject.GetComponentsInChildren<Text>()[5].text = $"Cost: {player2Faction[2].GetComponent<Character>().cost}\n\nHP: {player2Faction[2].GetComponent<Character>().totalHealth}\nDMG: {player2Faction[2].GetComponent<Character>().damage}\nSpeed: {player2Faction[2].GetComponent<Character>().movement}\n★: {player2Faction[2].GetComponent<Character>().ability}";
         }
         SummonPanel.gameObject.SetActive(true);
     }
@@ -259,7 +262,7 @@ public class GameManager : MonoBehaviour
         unitUI.SetActive(true);
         Character unit = selectedUnit.GetComponent<Character>();
         unitName.text = unit.unitName;
-        unitHP.text = $"HP: {unit.totalHealth.ToString()}";
+        unitHP.text = $"HP: {unit.currentHealth.ToString()}/{unit.totalHealth.ToString()}";
         unitDMG.text = $"DMG: {unit.damage.ToString()}";
     }
 
@@ -272,6 +275,11 @@ public class GameManager : MonoBehaviour
             player2EnergyText.text = $"Energy: {player2Energy.ToString()}";
             currentFaction.text = $"{player2Faction[0].GetComponent<Character>().faction}'s Turn";
         }
+        player1ObjText.text = $"Objective: {player1ObjectivePoints}/100";
+        player2ObjText.text = $"Objective: {player2ObjectivePoints}/100";
+
+        player1ObjSlider.value = player1ObjectivePoints / 100.0f;
+        player2ObjSlider.value = player2ObjectivePoints / 100.0f;
     }
 
     public void ClearUI() {
@@ -282,10 +290,12 @@ public class GameManager : MonoBehaviour
         if (currentPlayer == 1) {
             currentPlayer = 2;
             player2Energy += 10;
+            endButton.GetComponent<Image>().color = new Color(0f, 0f, 1f, 1f);
         } else {
             currentPlayer = 1;
             player1Energy += 10;
             turnCounter++;
+            endButton.GetComponent<Image>().color = new Color(1f, 0f, 0f, 1f);
             turnText.text = $"Turn {turnCounter.ToString()}";
         }
         UpdateUI();
@@ -305,7 +315,6 @@ public class GameManager : MonoBehaviour
             TileBehavior.selectedTile.GetComponent<TileBehavior>().SelectionStateToNull();
         }
         AddCTPObjectivePoints();
-        Debug.Log($"{player1ObjectivePoints}:{player2ObjectivePoints}");
     }
     #endregion
 
@@ -336,6 +345,7 @@ public class GameManager : MonoBehaviour
         else {
             player2ObjectivePoints += 20;
         }
+        UpdateUI();
     }
 
     public void AddCTPObjectivePoints()
@@ -346,6 +356,7 @@ public class GameManager : MonoBehaviour
             } else {
                 player2ObjectivePoints += 10;
             }
+            UpdateUI();
         }
     }
     #endregion

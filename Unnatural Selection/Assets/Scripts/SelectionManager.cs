@@ -63,11 +63,16 @@ public class SelectionManager : MonoBehaviour
         currentFaction = unitCollection.FactionPicker(currentFactionInt);
         factionText.text = currentFaction[0].GetComponent<Character>().faction;
         firstUnit.sprite = currentFaction[0].GetComponent<Character>().sprite;
-        firstUnit.gameObject.GetComponentInChildren<Text>().text = currentFaction[0].GetComponent<Character>().unitName;
+        firstUnit.gameObject.GetComponentsInChildren<Text>()[0].text = currentFaction[0].GetComponent<Character>().unitName;
+        firstUnit.gameObject.GetComponentsInChildren<Text>()[1].text = $"Cost: {currentFaction[0].GetComponent<Character>().cost}\n\nHP: {currentFaction[0].GetComponent<Character>().totalHealth}\nDMG: {currentFaction[0].GetComponent<Character>().damage}\nSpeed: {currentFaction[0].GetComponent<Character>().movement}\n★: {currentFaction[0].GetComponent<Character>().ability}";
+
         secondUnit.sprite = currentFaction[1].GetComponent<Character>().sprite;
-        secondUnit.gameObject.GetComponentInChildren<Text>().text = currentFaction[1].GetComponent<Character>().unitName;
+        secondUnit.gameObject.GetComponentsInChildren<Text>()[0].text = currentFaction[1].GetComponent<Character>().unitName;
+        secondUnit.gameObject.GetComponentsInChildren<Text>()[1].text = $"Cost: {currentFaction[1].GetComponent<Character>().cost}\n\nHP: {currentFaction[1].GetComponent<Character>().totalHealth}\nDMG: {currentFaction[1].GetComponent<Character>().damage}\nSpeed: {currentFaction[1].GetComponent<Character>().movement}\n★: {currentFaction[1].GetComponent<Character>().ability}";
+
         thirdUnit.sprite = currentFaction[2].GetComponent<Character>().sprite;
-        thirdUnit.gameObject.GetComponentInChildren<Text>().text = currentFaction[2].GetComponent<Character>().unitName;
+        thirdUnit.gameObject.GetComponentsInChildren<Text>()[0].text = currentFaction[1].GetComponent<Character>().unitName;
+        thirdUnit.gameObject.GetComponentsInChildren<Text>()[1].text = $"Cost: {currentFaction[2].GetComponent<Character>().cost}\n\nHP: {currentFaction[2].GetComponent<Character>().totalHealth}\nDMG: {currentFaction[2].GetComponent<Character>().damage}\nSpeed: {currentFaction[2].GetComponent<Character>().movement}\n★: {currentFaction[2].GetComponent<Character>().ability}";
     }
 
     public void UpdateFactionImage() {

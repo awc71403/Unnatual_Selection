@@ -40,7 +40,11 @@ public abstract class Character : MonoBehaviour {
 
     #region Extra
     [SerializeField]
+    private Text damageTextPrefab;
+    [SerializeField]
     private AudioClip[] stepSounds;
+    [SerializeField]
+    private AudioClip[] attackSounds;
     private AudioSource audioSource;
 
     // Movement Bounce Animation
@@ -177,7 +181,24 @@ public abstract class Character : MonoBehaviour {
         // Go white
         WhiteSprite();
 
-        yield return new WaitForSeconds(0.1f);
+        //Create Damage Text
+        Text damageText = Instantiate(damageTextPrefab, GameManager.GetSingleton().SummonPanel.canvas.transform);
+        //damageText.transform.SetParent(GameObject.Find("Canvas").transform, false);
+        Vector3 textPositionOffset = new Vector3(0, 1.25f, 0);
+        damageText.transform.position = Camera.main.WorldToScreenPoint(transform.position + textPositionOffset);
+        damageText.GetComponent<DamageText>().SetDamage(damage);
+
+        // Shaking
+        Vector3 defaultPosition = transform.position;
+        System.Random r = new System.Random();
+        for (int i = 0; i < 5; i++) {
+            double horizontalOffset = r.NextDouble() * 0.2 - 0.1f;
+            //double verticalOffset = r.NextDouble() * 0.2 - 0.1f;
+            Vector3 vectorOffset = new Vector3((float)horizontalOffset, 0, 0);
+            transform.position += vectorOffset;
+            yield return new WaitForSeconds(0.025f);
+            transform.position = defaultPosition;
+        }
 
         // Go normal
         NormalSprite();
@@ -186,7 +207,7 @@ public abstract class Character : MonoBehaviour {
     IEnumerator DeathAnimation() {
         // loop over 0.5 second backwards
         print("death time");
-        for (float i = 0.25f; i >= 0; i -= Time.deltaTime) {
+        for (float i = 0.5f; i >= 0; i -= Time.deltaTime) {
             // set color with i as alpha
             myRenderer.color = new Color(1, 1, 1, i);
             transform.localScale = new Vector3(1.5f - i, 1.5f - i, 1);
@@ -195,7 +216,13 @@ public abstract class Character : MonoBehaviour {
 
         myRenderer.color = new Color(1, 1, 1, 1);
         transform.localScale = new Vector3(1, 1, 1);
-        gameObject.SetActive(false);
+        if (GameManager.GetSingleton().getCurrent() == 1) {
+            GameManager.GetSingleton().player2Units.Remove(this.gameObject);
+        }
+        else {
+            GameManager.GetSingleton().player1Units.Remove(this.gameObject);
+        }
+        Destroy(gameObject);
     }
 
     public void StartBounceAnimation() {
@@ -219,7 +246,6 @@ public abstract class Character : MonoBehaviour {
         // Play random step sound
         System.Random r = new System.Random();
         int stepNum = r.Next(0, stepSounds.Length);
-        Debug.Log(stepNum);
         audioSource.clip = stepSounds[stepNum];
         audioSource.Play();
     }
@@ -232,6 +258,15 @@ public abstract class Character : MonoBehaviour {
         else if (player == 2) {
             //anim.SetInteger("player", 2);
         }
+    }
+
+    public void AttackSound() {
+        // Add sound
+        // Play random step sound
+        System.Random r = new System.Random();
+        int attackNum = r.Next(0, attackSounds.Length);
+        audioSource.clip = attackSounds[attackNum];
+        audioSource.Play();
     }
 
     #region Stats

@@ -36,6 +36,10 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
     public float playerOpacity;
     public float enemyOpacity;
 
+    [SerializeField]
+    private AudioClip[] warpSounds;
+    AudioSource audioSource;
+
     float stepDuration = 0.1f;
     #endregion
 
@@ -44,6 +48,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
         tileHighlighter.transform.position = transform.position;
         tileHighlighterAnimator = tileHighlighter.GetComponent<Animator>();
         setHighlightOpacity(playerOpacity);
+        audioSource = GetComponent<AudioSource>();
     }
     #endregion
 
@@ -187,7 +192,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
     #region Highlight Valid Tiles Functions
     void HighlightMoveableTiles(int moveEnergy) {
         // Don't do anything if you've run out of energy.
-        if (moveEnergy < 0 || tileType == "wall" || tileType == "nexus") {
+        if (moveEnergy < 0 || tileType == "building" || tileType == "nexus") {
             return;
         }
 
@@ -208,7 +213,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
             if (hit.collider != null) {
                 TileBehavior otherTile = hit.transform.GetComponent<TileBehavior>();
                 if (otherTile.myUnit == null || otherTile.myUnit.GetComponent<Character>().player == selectedUnit.GetComponent<Character>().player) {
-                    hit.transform.GetComponent<TileBehavior>().HighlightMoveableTiles(moveEnergy - movementCost);
+                    hit.transform.GetComponent<TileBehavior>().HighlightMoveableTiles(moveEnergy - otherTile.movementCost);
                 }
             }
         }
@@ -247,7 +252,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
                         }
                     }
                     // If that tile is a wall...
-                    else if (hit.gameObject.GetComponent<TileBehavior>().tileType == "wall") {
+                    else if (hit.gameObject.GetComponent<TileBehavior>().tileType == "building") {
                         // Stop. Do not pass Go. Do not collect 200 dollars.
                         break;
                     }
@@ -270,7 +275,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
 
     void HighlightRangeMovement(int moveEnergy) {
         // Don't do anything if you've run out of energy.
-        if (moveEnergy < 0 || tileType == "wall" || tileType == "nexus") {
+        if (moveEnergy < 0 || tileType == "building" || tileType == "nexus") {
             return;
         }
 
@@ -349,7 +354,6 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
             return;
         }
         // If nothing is currently selected...
-        Debug.Log(selectionState);
         if (selectionState == null) {
             // and if it was a right click...
             if (data.button == PointerEventData.InputButton.Right) {
@@ -421,6 +425,10 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
                     // (Attack), and deselect everything.
 
                     //ADD CODE FOR ATTACK
+                    if (myUnit.GetComponent<Character>().faction != selectedUnit.GetComponent<Character>().faction) {
+                        selectedUnit.GetComponent<Character>().attack(myUnit);
+                    }
+
                     if (tileType == "capturepoint") {
                         myUnit.GetComponent<Character>().attacked = true;
                     }
@@ -460,6 +468,12 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
                 else if (highlighted && tileType != "nexus") {
                     gameManager.PlaceCharacterOnTile(GameManager.GetSingleton().boughtUnit, xPosition, yPosition, GameManager.currentPlayer);
                     gameManager.SubtractCost();
+                    // Add sound
+                    // Play random step sound
+                    System.Random r = new System.Random();
+                    int warpNum = r.Next(0, warpSounds.Length);
+                    audioSource.clip = warpSounds[warpNum];
+                    audioSource.Play();
                     SelectionStateToNull();
                 }
             }
@@ -633,6 +647,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
 
         // Action over!
         GameManager.actionInProcess = false;
+        unit.GetComponent<Character>().TileToXY(GetComponent<TileBehavior>());
         gameObject.GetComponent<TileBehavior>().SelectionStateToAttack();
         
     }
@@ -654,7 +669,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
         Vector2[] directions = { Vector2.right, Vector2.left, Vector2.up, Vector2.down };
         foreach (Vector2 direction in directions) {
             RaycastHit2D hit = Physics2D.Raycast(currentTile.transform.position, direction, 1.0f);
-            if (hit.collider != null && hit.transform.GetComponent<TileBehavior>().tileType != "wall") {
+            if (hit.collider != null && hit.transform.GetComponent<TileBehavior>().tileType != "building") {
                 GameObject otherTileUnit = hit.transform.GetComponent<TileBehavior>().myUnit;
                 if (otherTileUnit == null || otherTileUnit.GetComponent<Character>().player == unitPlayer) {
                     List<string> newMovement = new List<string>(movement.ToArray());

@@ -86,8 +86,12 @@ public class TestClass : Character
             }
         }
         currentHealth -= dmgtaken;
-        if(currentHealth <= 0)
-        {
+        if (currentHealth > 0) {
+            StartCoroutine("HurtAnimation", dmgtaken);
+        }
+        else {
+            StartCoroutine("DeathAnimation");
+            //Fix timer
             ondeathhandler();
         }
     }
@@ -141,18 +145,21 @@ public class TestClass : Character
         {
             if(GameManager.GetSingleton().getCurrent() == 1)
             {
-                GameManager.GetSingleton().player2ObjectivePoints += cost;
+                GameManager.GetSingleton().player1ObjectivePoints += cost;
+                GameManager.GetSingleton().player1Units.Remove(this.gameObject);
             } else
             {
-                GameManager.GetSingleton().player1ObjectivePoints += cost;
+                GameManager.GetSingleton().player2ObjectivePoints += cost;
+                GameManager.GetSingleton().player2Units.Remove(this.gameObject);
             }
-            GameManager.GetSingleton().player1Units.Remove(this.gameObject);
+            GameManager.GetSingleton().UpdateUI();
         }
     }
 
     public override void attack(GameObject target)
     {
         //TODO: implement this
+        AttackSound();
         TileBehavior targettile = target.GetComponent<TestClass>().occupiedTile.GetComponent<TileBehavior>();
         int curdmg = damage;
         string targetname = target.GetComponent<TestClass>().unitName;
@@ -160,7 +167,7 @@ public class TestClass : Character
         {
             //implement grunt adjacency checks, tbh idk how to do this yet
             List<GameObject> adjacentlist = getadjacent(targettile);
-            curdmg = -1;
+            curdmg = 2;
             foreach (GameObject unit in adjacentlist)
             {
                 if (unit.GetComponent<TestClass>().faction == "insect")
@@ -208,7 +215,6 @@ public class TestClass : Character
                 curdmg = 4;
             }
         }
-        target.GetComponent<TestClass>().TakeDamage(curdmg);
         if (unitName == "Beetle")
         {
             if (targettile.xPosition > positionx)
@@ -217,6 +223,7 @@ public class TestClass : Character
                 if (GameManager.GetSingleton().mapArray[place, positiony].GetComponent<TileBehavior>().myUnit == null)
                 {
                     GameManager.GetSingleton().mapArray[place, positiony].GetComponent<TileBehavior>().PlaceUnit(target);
+                    target.GetComponent<Character>().TileToXY(targettile);
                     targettile.ClearUnit();
                 }
             }
@@ -226,6 +233,7 @@ public class TestClass : Character
                 if (GameManager.GetSingleton().mapArray[place, positiony].GetComponent<TileBehavior>().myUnit == null)
                 {
                     GameManager.GetSingleton().mapArray[place, positiony].GetComponent<TileBehavior>().PlaceUnit(target);
+                    target.GetComponent<Character>().TileToXY(targettile);
                     targettile.ClearUnit();
                 }
             }
@@ -235,15 +243,17 @@ public class TestClass : Character
                 if (GameManager.GetSingleton().mapArray[positionx, place].GetComponent<TileBehavior>().myUnit == null)
                 {
                     GameManager.GetSingleton().mapArray[positionx, place].GetComponent<TileBehavior>().PlaceUnit(target);
+                    target.GetComponent<Character>().TileToXY(targettile);
                     targettile.ClearUnit();
                 }
             }
-            if (targettile.yPosition < positiony)
+            else if (targettile.yPosition < positiony)
             {
                 int place = positiony + 1;
                 if (GameManager.GetSingleton().mapArray[place, positiony].GetComponent<TileBehavior>().myUnit == null)
                 {
                     GameManager.GetSingleton().mapArray[positionx, place].GetComponent<TileBehavior>().PlaceUnit(target);
+                    target.GetComponent<Character>().TileToXY(targettile);
                     targettile.ClearUnit();
                 }
             }
@@ -254,7 +264,8 @@ public class TestClass : Character
             //check if square opposite of beetle is open
             //set position of the target to the spot behind beetle
         }
-       
+        target.GetComponent<TestClass>().TakeDamage(curdmg);
+
     }
     /*public override List<int[,]> GetAttackRange() {
         int flipIfPlayer2 = 1;

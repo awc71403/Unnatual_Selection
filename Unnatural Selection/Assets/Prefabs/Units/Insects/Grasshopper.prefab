@@ -115,11 +115,16 @@ MonoBehaviour:
   canAttack: 1
   attacked: 0
   occupiedTile: {fileID: 0}
+  damageTextPrefab: {fileID: 8449641663928675022, guid: 88267e090c2a05f4480eda9e9f32f63d,
+    type: 3}
   stepSounds:
   - {fileID: 8300000, guid: 3025f3c3c48b1fd409fba15ff5462e40, type: 3}
   - {fileID: 8300000, guid: dacb66efe3b525542aed415fd5dd4aa6, type: 3}
   - {fileID: 8300000, guid: abc2afeb060d80542b6b27b96db59eee, type: 3}
   - {fileID: 8300000, guid: c9f974bfea7f625469d5c02648e9fdec, type: 3}
+  attackSounds:
+  - {fileID: 8300000, guid: 7143fb7226de5d048bb7e1b4f11bcb82, type: 3}
+  - {fileID: 8300000, guid: a8625b13fdcdb6b429b7e338f367d7fa, type: 3}
 --- !u!95 &7551052665201905964
 Animator:
   serializedVersion: 3
@@ -151,7 +156,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
-  m_Volume: 1
+  m_Volume: 0.2
   m_Pitch: 1
   Loop: 0
   Mute: 0
