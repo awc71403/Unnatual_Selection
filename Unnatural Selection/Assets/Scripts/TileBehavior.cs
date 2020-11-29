@@ -217,8 +217,17 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
             RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, 1.0f);
             if (hit.collider != null) {
                 TileBehavior otherTile = hit.transform.GetComponent<TileBehavior>();
+                int cent = 0;
+                List<GameObject> adjacentlist = getadjacent(otherTile);
+                foreach (GameObject unit in adjacentlist)
+                {
+                    if (unit.GetComponent<TestClass>().unitName == "Centurion")
+                    {
+                        cent = 1;
+                    }
+                }
                 if (otherTile.myUnit == null || otherTile.myUnit.GetComponent<Character>().player == selectedUnit.GetComponent<Character>().player) {
-                    hit.transform.GetComponent<TileBehavior>().HighlightMoveableTiles(moveEnergy - otherTile.movementCost);
+                    hit.transform.GetComponent<TileBehavior>().HighlightMoveableTiles(moveEnergy - otherTile.movementCost - cent);
                 }
             }
         }
@@ -728,6 +737,52 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
 
         // If there are no valid paths from this point, return null
         return null;
+    }
+    #endregion
+
+    #region Helper Functions
+    public List<GameObject> getadjacent(TileBehavior tile)
+    {
+        List<GameObject> retunitlist = new List<GameObject>();
+        int thisx = tile.GetComponent<TileBehavior>().xPosition;
+        int thisy = tile.GetComponent<TileBehavior>().yPosition;
+        if (thisy > 0)
+        {
+            int[,] up = new int[thisx, thisy - 1];
+            GameObject unit = GameManager.GetSingleton().mapArray[thisx, thisy - 1].GetComponent<TileBehavior>().myUnit;
+            if (unit != null)
+            {
+                retunitlist.Add(unit);
+            }
+        }
+        if (thisy < 12)
+        {
+            int[,] down = new int[thisx, thisy + 1];
+            GameObject unit = GameManager.GetSingleton().mapArray[thisx, thisy + 1].GetComponent<TileBehavior>().myUnit;
+            if (unit != null)
+            {
+                retunitlist.Add(unit);
+            }
+        }
+        if (thisx > 0)
+        {
+            int[,] left = new int[thisx - 1, thisy];
+            GameObject unit = GameManager.GetSingleton().mapArray[thisx - 1, thisy].GetComponent<TileBehavior>().myUnit;
+            if (unit != null)
+            {
+                retunitlist.Add(unit);
+            }
+        }
+        if (thisx < 18)
+        {
+            int[,] right = new int[thisx + 1, thisy];
+            GameObject unit = GameManager.GetSingleton().mapArray[thisx + 1, thisy].GetComponent<TileBehavior>().myUnit;
+            if (unit != null)
+            {
+                retunitlist.Add(unit);
+            }
+        }
+        return retunitlist;
     }
     #endregion
 }

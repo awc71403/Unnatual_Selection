@@ -151,7 +151,18 @@ public class TestClass : Character
         GameManager gameManager = GameManager.GetSingleton();
         if (currentHealth <= 0)
         {
-            if(gameManager.getCurrent() == 1)
+            if(unitName == "Keresu")
+            {
+                List<GameObject> adjacentlist = getadjacent(occupiedTile.GetComponent<TileBehavior>());
+                foreach (GameObject unit in adjacentlist)
+                {
+                    if (unit.GetComponent<TestClass>().faction != "shadow")
+                    {
+                        unit.GetComponent<TestClass>().TakeDamage(1);
+                    }
+                }
+            }
+            if(GameManager.GetSingleton().getCurrent() == 1)
             {
                 gameManager.AddObjPoints(1, cost);
                 gameManager.player1Units.Remove(this.gameObject);
@@ -171,6 +182,19 @@ public class TestClass : Character
         TileBehavior targettile = target.GetComponent<TestClass>().occupiedTile.GetComponent<TileBehavior>();
         int curdmg = damage;
         string targetname = target.GetComponent<TestClass>().unitName;
+        if (unitName == "Tyoudure")
+        {
+            List<GameObject> adjacentlist = getadjacent(targettile);
+            curdmg = 2;
+            foreach (GameObject unit in adjacentlist)
+            {
+                if (unit.GetComponent<TestClass>().faction == "shadow")
+                {
+                    curdmg += 1;
+                    unit.GetComponent<TestClass>().TakeDamage(1);
+                }
+            }
+        }
         if (unitName == "Grunt")
         {
             //implement grunt adjacency checks, tbh idk how to do this yet
