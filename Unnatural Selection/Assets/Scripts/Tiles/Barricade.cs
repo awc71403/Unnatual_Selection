@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Barricade : TileBehavior
 {
-    private int movement = 3;
+    private int movement = 2;
 
     void Awake()
     {

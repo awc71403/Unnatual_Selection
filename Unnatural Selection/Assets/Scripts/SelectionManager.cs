@@ -91,11 +91,11 @@ public class SelectionManager : MonoBehaviour
     public void Confirm() {
         if (player1Faction == -1) {
             player1Faction = currentFactionInt;
-            if (currentFactionInt == 0) {
+            if (currentFactionInt == 0 || currentFactionInt == 1) {
                 currentFactionInt++;
             }
             else {
-                currentFactionInt--;
+                currentFactionInt = 0;
             }
             LoadFaction();
             UpdateFactionImage();

@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class TestClass : Character
@@ -70,7 +71,7 @@ public class TestClass : Character
     {
         bool lorge = false;
         int dmgtaken = damage;
-        if(faction == "rock")
+        if(faction == "Rock")
         {
             List<GameObject> adjacentlist = getadjacent(occupiedTile.GetComponent<TileBehavior>());
             foreach (GameObject unit in adjacentlist)
@@ -85,7 +86,12 @@ public class TestClass : Character
                 dmgtaken -= 1;
             }
         }
+        if (occupiedTile.GetComponent<TileBehavior>().tileType == "barricade" && !beenAttacked) {
+            beenAttacked = true;
+            dmgtaken = (int) Mathf.Floor(dmgtaken / 2);
+        }
         currentHealth -= dmgtaken;
+        gameObject.GetComponentInChildren<TextMeshProUGUI>().text = currentHealth.ToString();
         if (currentHealth > 0) {
             StartCoroutine("HurtAnimation", dmgtaken);
         }
@@ -103,6 +109,7 @@ public class TestClass : Character
             if(currentHealth < totalHealth)
             {
                 currentHealth++;
+                gameObject.GetComponentInChildren<TextMeshProUGUI>().text = currentHealth.ToString();
             }
         }
     }
@@ -141,18 +148,19 @@ public class TestClass : Character
     }
     public override void ondeathhandler() //need to wait on this one to decide how summoning is implemented etc
     {
-        if(currentHealth <= 0)
+        GameManager gameManager = GameManager.GetSingleton();
+        if (currentHealth <= 0)
         {
-            if(GameManager.GetSingleton().getCurrent() == 1)
+            if(gameManager.getCurrent() == 1)
             {
-                GameManager.GetSingleton().player1ObjectivePoints += cost;
-                GameManager.GetSingleton().player1Units.Remove(this.gameObject);
+                gameManager.AddObjPoints(1, cost);
+                gameManager.player1Units.Remove(this.gameObject);
             } else
             {
-                GameManager.GetSingleton().player2ObjectivePoints += cost;
-                GameManager.GetSingleton().player2Units.Remove(this.gameObject);
+                gameManager.AddObjPoints(2, cost);
+                gameManager.player2Units.Remove(this.gameObject);
             }
-            GameManager.GetSingleton().UpdateUI();
+            gameManager.UpdateUI();
         }
     }
 
@@ -170,7 +178,7 @@ public class TestClass : Character
             curdmg = 2;
             foreach (GameObject unit in adjacentlist)
             {
-                if (unit.GetComponent<TestClass>().faction == "insect")
+                if (unit.GetComponent<TestClass>().faction == "Insect" && unit != gameObject)
                 {
                     curdmg += 1;
                 }
@@ -181,7 +189,7 @@ public class TestClass : Character
             List<GameObject> adjacentlist = getadjacent(targettile);
             foreach (GameObject unit in adjacentlist)
             {
-                if (unit.GetComponent<TestClass>().faction != "rock")
+                if (unit != gameObject)
                 {
                     unit.GetComponent<TestClass>().TakeDamage(1);
                 }
@@ -220,7 +228,7 @@ public class TestClass : Character
             if (targettile.xPosition > positionx)
             {
                 int place = positionx - 1;
-                if (GameManager.GetSingleton().mapArray[place, positiony].GetComponent<TileBehavior>().myUnit == null)
+                if (place >= 0 && GameManager.GetSingleton().mapArray[place, positiony].GetComponent<TileBehavior>().myUnit == null)
                 {
                     GameManager.GetSingleton().mapArray[place, positiony].GetComponent<TileBehavior>().PlaceUnit(target);
                     target.GetComponent<Character>().TileToXY(targettile);
@@ -230,7 +238,8 @@ public class TestClass : Character
             else if (targettile.xPosition < positionx)
             {
                 int place = positionx + 1;
-                if (GameManager.GetSingleton().mapArray[place, positiony].GetComponent<TileBehavior>().myUnit == null)
+                
+                if (place < GameManager.GetSingleton().mapXSize && GameManager.GetSingleton().mapArray[place, positiony].GetComponent<TileBehavior>().myUnit == null)
                 {
                     GameManager.GetSingleton().mapArray[place, positiony].GetComponent<TileBehavior>().PlaceUnit(target);
                     target.GetComponent<Character>().TileToXY(targettile);
@@ -240,7 +249,7 @@ public class TestClass : Character
             else if (targettile.yPosition > positiony)
             {
                 int place = positiony - 1;
-                if (GameManager.GetSingleton().mapArray[positionx, place].GetComponent<TileBehavior>().myUnit == null)
+                if (place >= 0 && GameManager.GetSingleton().mapArray[positionx, place].GetComponent<TileBehavior>().myUnit == null)
                 {
                     GameManager.GetSingleton().mapArray[positionx, place].GetComponent<TileBehavior>().PlaceUnit(target);
                     target.GetComponent<Character>().TileToXY(targettile);
@@ -250,19 +259,18 @@ public class TestClass : Character
             else if (targettile.yPosition < positiony)
             {
                 int place = positiony + 1;
-                if (GameManager.GetSingleton().mapArray[place, positiony].GetComponent<TileBehavior>().myUnit == null)
+                if (place < GameManager.GetSingleton().mapYSize && GameManager.GetSingleton().mapArray[place, positiony].GetComponent<TileBehavior>().myUnit == null)
                 {
                     GameManager.GetSingleton().mapArray[positionx, place].GetComponent<TileBehavior>().PlaceUnit(target);
                     target.GetComponent<Character>().TileToXY(targettile);
                     targettile.ClearUnit();
                 }
             }
-            if (targetname == "Stalmight")
-            {
-                TakeDamage(2);
-            }
             //check if square opposite of beetle is open
             //set position of the target to the spot behind beetle
+        }
+        if (targetname == "Stalmight") {
+            TakeDamage(2);
         }
         target.GetComponent<TestClass>().TakeDamage(curdmg);
 

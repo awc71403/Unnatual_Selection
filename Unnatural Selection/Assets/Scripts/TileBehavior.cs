@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using System;
 
 public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler {
     #region Selection Variables
@@ -62,6 +63,10 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
 
     #region Unit Functions
     public void PlaceUnit(GameObject unit) {
+        if (unit.GetComponent<Character>().occupiedTile) {
+            unit.GetComponent<Character>().occupiedTile.GetComponent<TileBehavior>().myUnit = null;
+            unit.GetComponent<Character>().occupiedTile = gameObject;
+        }
         unit.GetComponent<Character>().SetAnimVar();
         myUnit = unit;
         myUnit.transform.position = transform.position - new Vector3(0, 0, 0);
@@ -192,7 +197,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
     #region Highlight Valid Tiles Functions
     void HighlightMoveableTiles(int moveEnergy) {
         // Don't do anything if you've run out of energy.
-        if (moveEnergy < 0 || tileType == "building" || tileType == "nexus") {
+        if (moveEnergy < 0 || tileType == "nexus") {
             return;
         }
 
@@ -252,10 +257,6 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
                         }
                     }
                     // If that tile is a wall...
-                    else if (hit.gameObject.GetComponent<TileBehavior>().tileType == "building") {
-                        // Stop. Do not pass Go. Do not collect 200 dollars.
-                        break;
-                    }
                     else {
                         // Keep going.
                         hit.gameObject.GetComponent<TileBehavior>().HighlightCanAttackEmpty(enemySelect);
@@ -275,7 +276,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
 
     void HighlightRangeMovement(int moveEnergy) {
         // Don't do anything if you've run out of energy.
-        if (moveEnergy < 0 || tileType == "building" || tileType == "nexus") {
+        if (moveEnergy < 0 || tileType == "nexus") {
             return;
         }
 
@@ -296,8 +297,20 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
             RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, 1.0f);
             if (hit.collider != null) {
                 TileBehavior otherTile = hit.transform.GetComponent<TileBehavior>();
+                int extra = 0;
                 if (otherTile.myUnit == null || otherTile.myUnit.GetComponent<Character>().player == selectedUnit.GetComponent<Character>().player) {
-                    hit.transform.GetComponent<TileBehavior>().HighlightRangeMovement(moveEnergy - movementCost);
+                    if (otherTile.tileType == "sand") {
+                        extra = (int)Math.Ceiling((decimal)myUnit.GetComponent<Character>().cost / 3);
+                        if (moveEnergy - otherTile.movementCost - extra < 0) {
+                            hit.transform.GetComponent<TileBehavior>().HighlightRangeMovement(0);
+                        }
+                        else {
+                            hit.transform.GetComponent<TileBehavior>().HighlightRangeMovement(moveEnergy - otherTile.movementCost - extra);
+                        }
+                    }
+                    else {
+                        hit.transform.GetComponent<TileBehavior>().HighlightRangeMovement(moveEnergy - otherTile.movementCost);
+                    }
                 }
             }
         }
@@ -308,7 +321,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
             return;
         }
 
-        if (!moveableTiles.Contains(gameObject)) {
+        if (!highlighted) {
             HighlightCanAttack();
             highlightedTiles.Add(gameObject);
         }
@@ -339,7 +352,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
             RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, 1.0f);
             if (hit.collider != null) {
                 TileBehavior otherTile = hit.transform.GetComponent<TileBehavior>();
-                if (otherTile.tileType == "nexus" && tileType == "nexus" || tileType == "nexus") {
+                if (otherTile.tileType == "nexus" || tileType == "nexus") {
                     hit.transform.GetComponent<TileBehavior>().HighlightSummonableTiles();
                 }
             }
@@ -350,7 +363,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
     #region Selection Functions
     public virtual void OnPointerClick(PointerEventData data) {
         //Condition where pointer click fails
-        if (GameManager.actionInProcess) {
+        if (GameManager.actionInProcess || GameManager.menuOpened) {
             return;
         }
         // If nothing is currently selected...
@@ -381,6 +394,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
 
             // and this tile does not have a unit on it...
             else {
+                GameManager.GetSingleton().ShowLeftMenu();
                 // do nothing.
             }
         }
@@ -394,7 +408,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
                     return;
                 }
                 // and the selected character can move onto this tile...
-                if (highlighted && myUnit == null) {
+                if (highlighted && myUnit == null && moveableTiles.Contains(gameObject)) {
                     // move that character onto this tile and dehighlight everything.
                     selectedTile.GetComponent<TileBehavior>().ClearUnit();
                     // attack here
@@ -421,6 +435,12 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
             // and selection state is attack...
             else if (selectionState.Equals("attack")) {
                 // and the selected character can attack there...
+                if (data.button == PointerEventData.InputButton.Right) {
+                    selectedUnit.GetComponent<Character>().previousTile.GetComponent<TileBehavior>().PlaceUnit(selectedUnit);
+                    selectedUnit.GetComponent<Character>().SetCanMove(true);
+                    SelectionStateToNull();
+                    return;
+                }
                 if (highlighted && myUnit != null && myUnit.GetComponent<Character>().GetPlayer() != selectedUnit.GetComponent<Character>().GetPlayer()) {
                     // (Attack), and deselect everything.
 
@@ -429,8 +449,8 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
                         selectedUnit.GetComponent<Character>().attack(myUnit);
                     }
 
-                    if (tileType == "capturepoint") {
-                        myUnit.GetComponent<Character>().attacked = true;
+                    if (selectedUnit.GetComponent<Character>().occupiedTile.GetComponent<TileBehavior>().tileType == "capturepoint") {
+                        selectedUnit.GetComponent<Character>().hasAttacked = true;
                     }
                     selectedUnit.GetComponent<Character>().SetCanMove(false);
                     selectedUnit.GetComponent<Character>().SetCanAttack(false);
@@ -533,13 +553,15 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
         selectedUnit = myUnit;
         selectedTile = gameObject;
         HighlightSelected();
+        selectedUnit.GetComponent<Character>().previousTile = gameObject;
 
         // Open the Character UI
         GameManager.GetSingleton().ShowCharacterUI(selectedUnit);
 
         // Highlight moveable tiles
         if (selectedUnit.GetComponent<Character>().GetCanMove()) {
-            HighlightMoveableTiles(selectedUnit.GetComponent<Character>().GetMovement());
+            //Highlight range
+            HighlightRange(myUnit.GetComponent<Character>().movement, myUnit.GetComponent<Character>().maxrange);
         }
     }
 
@@ -669,7 +691,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
         Vector2[] directions = { Vector2.right, Vector2.left, Vector2.up, Vector2.down };
         foreach (Vector2 direction in directions) {
             RaycastHit2D hit = Physics2D.Raycast(currentTile.transform.position, direction, 1.0f);
-            if (hit.collider != null && hit.transform.GetComponent<TileBehavior>().tileType != "building") {
+            if (hit.collider != null) {
                 GameObject otherTileUnit = hit.transform.GetComponent<TileBehavior>().myUnit;
                 if (otherTileUnit == null || otherTileUnit.GetComponent<Character>().player == unitPlayer) {
                     List<string> newMovement = new List<string>(movement.ToArray());

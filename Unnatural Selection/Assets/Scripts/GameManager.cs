@@ -1,6 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class GameManager : MonoBehaviour
@@ -14,6 +16,7 @@ public class GameManager : MonoBehaviour
     public static int currentPlayer = 1;
     public int turnCounter = 1;
     public static bool actionInProcess;
+    public static bool menuOpened;
 
     [SerializeField]
     public Button endButton;
@@ -35,6 +38,9 @@ public class GameManager : MonoBehaviour
     public int player1ObjectivePoints;
     public int player2ObjectivePoints;
 
+    public int player1NexusStrikes;
+    public int player2NexusStrikes;
+
     public GameObject[,] mapArray;
     float tileSize;
 
@@ -46,10 +52,16 @@ public class GameManager : MonoBehaviour
 
     public Image CharacterUI;
 
+    public Image WinPanel;
+
     public GameObject boughtUnit;
 
     public UnitCollection unitCollection;
 
+    public Image leftMenu;
+
+    public int mapXSize;
+    public int mapYSize;
     #region UI Variables
     public Text turnText;
     public Text currentFaction;
@@ -82,10 +94,12 @@ public class GameManager : MonoBehaviour
         player1Units = new List<GameObject>();
         player1Energy = 10;
         player1ObjectivePoints = 0;
+        player1NexusStrikes = 0;
 
         player2Units = new List<GameObject>();
-        player2Energy = 0;
+        player2Energy = 2;
         player2ObjectivePoints = 0;
+        player2NexusStrikes = 0;
 
         tileSize = tilePrefabs[0].GetComponent<SpriteRenderer>().sprite.bounds.size.x;
         CreateTiles();
@@ -98,6 +112,11 @@ public class GameManager : MonoBehaviour
 
         UpdateUI();
     }
+
+    void Update() {
+        if (Input.GetMouseButtonDown(1) && menuOpened)
+            HideMenus();
+    }
     #endregion
 
     #region Set Up
@@ -108,8 +127,8 @@ public class GameManager : MonoBehaviour
 
         string[] mapData = ReadLevelText();
 
-        int mapXSize = mapData[0].ToCharArray().Length;
-        int mapYSize = mapData.Length;
+        mapXSize = mapData[0].ToCharArray().Length;
+        mapYSize = mapData.Length;
 
         // Fill mapArray, which should be empty at first.
         mapArray = new GameObject[mapXSize, mapYSize];
@@ -146,13 +165,13 @@ public class GameManager : MonoBehaviour
     private void PlaceTile(string tileType, int x, int y, Vector3 worldStart) {
         int tileIndex = int.Parse(tileType);
 
-        // Creates a new tile instance.
-        if (tileIndex == 0 || tileIndex == 1 || tileIndex == 2) {
-            tileIndex = Random.Range(0, 2);
-        }
         GameObject newTile = Instantiate(tilePrefabs[tileIndex]);
         if (newTile.GetComponent<TileBehavior>().tileType == "capturepoint") {
             capturePoint = newTile.GetComponent<CapturePoint>();
+        }
+
+        if (newTile.GetComponent<TileBehavior>().tileType == "asphalt") {
+            newTile.GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>($"Sprites/asphalt{Random.Range(1, 3)}");
         }
 
         //Put under tile object in Hierarchy
@@ -183,6 +202,7 @@ public class GameManager : MonoBehaviour
         newUnit.GetComponent<Character>().SetPlayer(player);
         newUnit.GetComponent<Character>().SetHPFull();
         mapArray[x, y].transform.GetComponent<TileBehavior>().PlaceUnit(newUnit);
+        newUnit.GetComponent<Character>().previousTile = newUnit.GetComponent<Character>().occupiedTile;
 
         if (exhausted) {
             newUnit.GetComponent<Character>().SetCanMove(false);
@@ -196,6 +216,9 @@ public class GameManager : MonoBehaviour
         }
         else if (player == 2) {
             player2Units.Add(newUnit);
+            newUnit.transform.rotation = Quaternion.Euler(0, 180, 0);
+            Debug.Log(newUnit.GetComponentInChildren<TextMeshProUGUI>().gameObject.name);
+            newUnit.GetComponentInChildren<TextMeshProUGUI>().rectTransform.localRotation = Quaternion.Euler(0, 180, 0);
         }
     }
     #endregion
@@ -215,13 +238,21 @@ public class GameManager : MonoBehaviour
                 boughtUnit = player2Faction[picker];
             }
         }
+        for (int i = 0; i < SummonPanel.GetComponentsInChildren<Button>().Length; i++) {
+            if (picker == i) {
+                SummonPanel.GetComponentsInChildren<Button>()[i].interactable = false;
+            }
+            else {
+                SummonPanel.GetComponentsInChildren<Button>()[i].interactable = true;
+            }
+        }
     }
 
     public void OpenSummonPanel() {
         if (currentPlayer == 1) {
-            SummonPanel.gameObject.GetComponentsInChildren<Image>()[1].sprite = player1Faction[0].GetComponent<Character>().sprite;
-            SummonPanel.gameObject.GetComponentsInChildren<Image>()[2].sprite = player1Faction[1].GetComponent<Character>().sprite;
-            SummonPanel.gameObject.GetComponentsInChildren<Image>()[3].sprite = player1Faction[2].GetComponent<Character>().sprite;
+            SummonPanel.gameObject.GetComponentsInChildren<Image>()[2].sprite = player1Faction[0].GetComponent<Character>().sprite;
+            SummonPanel.gameObject.GetComponentsInChildren<Image>()[4].sprite = player1Faction[1].GetComponent<Character>().sprite;
+            SummonPanel.gameObject.GetComponentsInChildren<Image>()[6].sprite = player1Faction[2].GetComponent<Character>().sprite;
             SummonPanel.gameObject.GetComponentsInChildren<Text>()[0].text = player1Faction[0].GetComponent<Character>().name;
             SummonPanel.gameObject.GetComponentsInChildren<Text>()[1].text = $"Cost: {player1Faction[0].GetComponent<Character>().cost}\n\nHP: {player1Faction[0].GetComponent<Character>().totalHealth}\nDMG: {player1Faction[0].GetComponent<Character>().damage}\nSpeed: {player1Faction[0].GetComponent<Character>().movement}\n★: {player1Faction[0].GetComponent<Character>().ability}";
             SummonPanel.gameObject.GetComponentsInChildren<Text>()[2].text = player1Faction[1].GetComponent<Character>().name;
@@ -230,15 +261,18 @@ public class GameManager : MonoBehaviour
             SummonPanel.gameObject.GetComponentsInChildren<Text>()[5].text = $"Cost: {player1Faction[2].GetComponent<Character>().cost}\n\nHP: {player1Faction[2].GetComponent<Character>().totalHealth}\nDMG: {player1Faction[2].GetComponent<Character>().damage}\nSpeed: {player1Faction[2].GetComponent<Character>().movement}\n★: {player1Faction[2].GetComponent<Character>().ability}";
         }
         else {
-            SummonPanel.gameObject.GetComponentsInChildren<Image>()[1].sprite = player2Faction[0].GetComponent<Character>().sprite;
-            SummonPanel.gameObject.GetComponentsInChildren<Image>()[2].sprite = player2Faction[1].GetComponent<Character>().sprite;
-            SummonPanel.gameObject.GetComponentsInChildren<Image>()[3].sprite = player2Faction[2].GetComponent<Character>().sprite;
+            SummonPanel.gameObject.GetComponentsInChildren<Image>()[2].sprite = player2Faction[0].GetComponent<Character>().sprite;
+            SummonPanel.gameObject.GetComponentsInChildren<Image>()[4].sprite = player2Faction[1].GetComponent<Character>().sprite;
+            SummonPanel.gameObject.GetComponentsInChildren<Image>()[6].sprite = player2Faction[2].GetComponent<Character>().sprite;
             SummonPanel.gameObject.GetComponentsInChildren<Text>()[0].text = player2Faction[0].GetComponent<Character>().name;
             SummonPanel.gameObject.GetComponentsInChildren<Text>()[1].text = $"Cost: {player2Faction[0].GetComponent<Character>().cost}\n\nHP: {player2Faction[0].GetComponent<Character>().totalHealth}\nDMG: {player2Faction[0].GetComponent<Character>().damage}\nSpeed: {player2Faction[0].GetComponent<Character>().movement}\n★: {player2Faction[0].GetComponent<Character>().ability}";
             SummonPanel.gameObject.GetComponentsInChildren<Text>()[2].text = player2Faction[1].GetComponent<Character>().name;
             SummonPanel.gameObject.GetComponentsInChildren<Text>()[3].text = $"Cost: {player2Faction[1].GetComponent<Character>().cost}\n\nHP: {player2Faction[1].GetComponent<Character>().totalHealth}\nDMG: {player2Faction[1].GetComponent<Character>().damage}\nSpeed: {player2Faction[1].GetComponent<Character>().movement}\n★: {player2Faction[1].GetComponent<Character>().ability}";
             SummonPanel.gameObject.GetComponentsInChildren<Text>()[4].text = player2Faction[2].GetComponent<Character>().name;
             SummonPanel.gameObject.GetComponentsInChildren<Text>()[5].text = $"Cost: {player2Faction[2].GetComponent<Character>().cost}\n\nHP: {player2Faction[2].GetComponent<Character>().totalHealth}\nDMG: {player2Faction[2].GetComponent<Character>().damage}\nSpeed: {player2Faction[2].GetComponent<Character>().movement}\n★: {player2Faction[2].GetComponent<Character>().ability}";
+        }
+        foreach (Button button in SummonPanel.GetComponentsInChildren<Button>()) {
+            button.interactable = true;
         }
         SummonPanel.gameObject.SetActive(true);
     }
@@ -296,7 +330,12 @@ public class GameManager : MonoBehaviour
             player1Energy += 10;
             turnCounter++;
             endButton.GetComponent<Image>().color = new Color(1f, 0f, 0f, 1f);
-            turnText.text = $"Turn {turnCounter.ToString()}";
+            if (turnCounter > 12) {
+                CheckEndGame();
+            }
+            else {
+                turnText.text = $"Turn {turnCounter.ToString()}";
+            }
         }
         UpdateUI();
 
@@ -304,17 +343,47 @@ public class GameManager : MonoBehaviour
         foreach (GameObject unit in player1Units) {
             unit.GetComponent<Character>().SetCanMove(true);
             unit.GetComponent<Character>().SetCanAttack(true);
+            unit.GetComponent<Character>().ResetStats();
+            if (player1Faction[0].GetComponent<Character>().faction == "Mech" && currentPlayer == 1) {
+                unit.GetComponent<TestClass>().Ability();
+            }
         }
         //For every character in Player 2/Enemy, set can move and can attack.
         foreach (GameObject unit in player2Units) {
             unit.GetComponent<Character>().SetCanMove(true);
             unit.GetComponent<Character>().SetCanAttack(true);
+            unit.GetComponent<Character>().ResetStats();
+            if (player2Faction[0].GetComponent<Character>().faction == "Mech" && currentPlayer == 2) {
+                unit.GetComponent<TestClass>().Ability();
+            }
         }
         //Reset selection state.
         if (TileBehavior.GetSelectionState() != null) {
             TileBehavior.selectedTile.GetComponent<TileBehavior>().SelectionStateToNull();
         }
         AddCTPObjectivePoints();
+        HideMenus();
+    }
+
+    public void ShowLeftMenu() {
+        leftMenu.gameObject.SetActive(true);
+        leftMenu.transform.position = Input.mousePosition;
+        menuOpened = true;
+    }
+
+    public void HideMenus() {
+        leftMenu.gameObject.SetActive(false);
+        menuOpened = false;
+    }
+
+    public void Surrender() {
+        HideMenus();
+        if (currentPlayer == 1) {
+            TriggerEndGame(2);
+        }
+        else {
+            TriggerEndGame(1);
+        }
     }
     #endregion
 
@@ -341,9 +410,17 @@ public class GameManager : MonoBehaviour
     {
         if (currentPlayer == 1) { 
             player1ObjectivePoints += 20;
+            player1NexusStrikes++;
+            if (player1NexusStrikes >= 3) {
+                TriggerEndGame(1);
+            }
         }
         else {
             player2ObjectivePoints += 20;
+            player2NexusStrikes++;
+            if (player2NexusStrikes >= 3) {
+                TriggerEndGame(2);
+            }
         }
         UpdateUI();
     }
@@ -357,7 +434,51 @@ public class GameManager : MonoBehaviour
                 player2ObjectivePoints += 10;
             }
             UpdateUI();
+            CheckEndGame();
         }
+    }
+
+    public void AddObjPoints(int player, int points) {
+        if (player == 1) {
+            player1ObjectivePoints += points;
+        }
+        else {
+            player2ObjectivePoints += points;
+        }
+        CheckEndGame();
+    }
+
+    public void CheckEndGame() {
+        if (player1ObjectivePoints >= 100) {
+            TriggerEndGame(1);
+        }
+        else if (player2ObjectivePoints >= 100) {
+            TriggerEndGame(2);
+        }
+        else if (turnCounter > 12) {
+            if (player1ObjectivePoints > player2ObjectivePoints) {
+                TriggerEndGame(1);
+            }
+            else {
+                TriggerEndGame(2);
+            }
+        }
+    }
+
+    public void TriggerEndGame(int player = 0) {
+        menuOpened = true;
+        WinPanel.gameObject.SetActive(true);
+        if (player == 1) {
+            WinPanel.GetComponentInChildren<TextMeshProUGUI>().text = $"{player1Faction[0].GetComponent<Character>().faction}s Win!";
+        } else {
+            WinPanel.GetComponentInChildren<TextMeshProUGUI>().text = $"{player2Faction[0].GetComponent<Character>().faction}s Win!";
+        }
+    }
+
+    public void ReturnTitle() {
+        SceneManager.LoadScene(0);
+        menuOpened = false;
+        Destroy(UnitCollection.GetSingleton().gameObject);
     }
     #endregion
 }

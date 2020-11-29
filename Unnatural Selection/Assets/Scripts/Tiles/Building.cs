@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Building : TileBehavior
 {
-    private int movement = 999;
+    private int movement = 3;
 
     void Awake()
     {

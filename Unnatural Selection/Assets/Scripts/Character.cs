@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -29,9 +30,11 @@ public abstract class Character : MonoBehaviour {
 
     public bool canMove = true;
     public bool canAttack = true;
-    public bool attacked = false;
+    public bool hasAttacked = false;
+    public bool beenAttacked = false;
 
     public GameObject occupiedTile;
+    public GameObject previousTile;
 
     // Sprite Rendering
     private SpriteRenderer myRenderer;
@@ -74,6 +77,7 @@ public abstract class Character : MonoBehaviour {
         shaderSpritesDefault = Shader.Find("Sprites/Default");
         audioSource = GetComponent<AudioSource>();
         SetHPFull();
+        gameObject.GetComponentInChildren<TextMeshProUGUI>().text = currentHealth.ToString();
     }
     #endregion
 
@@ -222,6 +226,7 @@ public abstract class Character : MonoBehaviour {
         else {
             GameManager.GetSingleton().player1Units.Remove(this.gameObject);
         }
+        //occupiedTile.GetComponent<TileBehavior>().myUnit = null;
         Destroy(gameObject);
     }
 
@@ -271,7 +276,7 @@ public abstract class Character : MonoBehaviour {
 
     #region Stats
     public void ResetStats() {
-        currentHealth = totalHealth;
+        beenAttacked = false;
     }
 
     public void HPDamage(int damage) {

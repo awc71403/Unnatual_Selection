@@ -10,7 +10,7 @@ public class CapturePoint : TileBehavior
     //turn = 1 when one turn has been ended on the point w/o attacking, turn = 2 when two turns have been ended on the point w/o attacking
     public int turn = 0;
     public GameObject unitOnPoint;
-
+    public bool unitBool;
     [SerializeField]
     private AudioClip[] captureSounds;
     AudioSource audioSource;
@@ -26,12 +26,15 @@ public class CapturePoint : TileBehavior
     // Update is called once per frame
     void Update()
     {
-        if (myUnit == null && unitOnPoint != null) {
+        if (myUnit == null && unitBool) {
             if (ownedBy == 0) {
-                unitOnPoint.GetComponent<Character>().attacked = false;
-                unitOnPoint = null;
+                Debug.Log("Update check");
+                if (unitOnPoint) {
+                    unitOnPoint.GetComponent<Character>().hasAttacked = false;
+                    unitOnPoint = null;
+                }
+                unitBool = false;
                 turn = 0;
-                Debug.Log("Cap stopped");
                 audioSource.clip = captureSounds[2];
                 audioSource.Play();
             }
@@ -39,17 +42,18 @@ public class CapturePoint : TileBehavior
     }
 
     public void Capture() {
-        if (!myUnit.GetComponent<Character>().attacked) {
+        Debug.Log("Capture check");
+        if (!myUnit.GetComponent<Character>().hasAttacked) {
             if (ownedBy == 0) {
                 if (turn == 0) {
                     unitOnPoint = myUnit;
+                    unitBool = true;
                     turn++;
-                    Debug.Log("Capping");
                     audioSource.clip = captureSounds[1];
                     audioSource.Play();
                 }
                 else if (turn == 1) {
-                    if (unitOnPoint.Equals(myUnit)) {
+                    if (unitBool) {
                         turn++;
                         ownedBy = unitOnPoint.GetComponent<Character>().player;
                         if (unitOnPoint.GetComponent<Character>().faction == "Insect") {
@@ -58,7 +62,6 @@ public class CapturePoint : TileBehavior
                         else {
                             GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/mechcap");
                         }
-                        Debug.Log("Capped");
                         audioSource.clip = captureSounds[0];
                         audioSource.Play();
                     }
@@ -70,7 +73,6 @@ public class CapturePoint : TileBehavior
                 GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/neutralcap");
                 audioSource.clip = captureSounds[2];
                 audioSource.Play();
-                Debug.Log("Cap neutralized");
             }
         }
     }
