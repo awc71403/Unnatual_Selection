@@ -71,12 +71,12 @@ SpriteRenderer:
   m_SortingLayerID: 1948701599
   m_SortingLayer: 1
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 8ecfa860efc462a46a844ea67fd830c6, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 92b2e81c9b271ad438d97c027265ab12, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 0.48, y: 0.48}
+  m_Size: {x: 1, y: 1}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
@@ -100,7 +100,7 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 1, y: 1}
-    newSize: {x: 0.48, y: 0.48}
+    newSize: {x: 1, y: 1}
     adaptiveTilingThreshold: 0.5
     drawMode: 0
     adaptiveTiling: 0
@@ -125,10 +125,12 @@ MonoBehaviour:
   xPosition: 0
   yPosition: 0
   tileType: 
+  tileName: 
+  tileDesc: 
   playerside: 0
   tileHighlighter: {fileID: 8401204555417688215}
-  playerOpacity: 0
-  enemyOpacity: 0
+  playerOpacity: 0.5
+  enemyOpacity: 0.5
   warpSounds: []
 --- !u!1 &8401204555417688215
 GameObject:

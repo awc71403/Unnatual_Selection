@@ -67,7 +67,7 @@ public class TestClass : Character
         positiony = tile.GetComponent<TileBehavior>().yPosition;
     }
 
-    public override void TakeDamage(int damage)
+    public override void TakeDamage(int damage, bool selfDamage = false)
     {
         bool lorge = false;
         int dmgtaken = damage;
@@ -87,9 +87,12 @@ public class TestClass : Character
             }
         }
         if (occupiedTile.GetComponent<TileBehavior>().tileType == "barricade" && !beenAttacked) {
-            beenAttacked = true;
             dmgtaken = (int) Mathf.Floor(dmgtaken / 2);
+            if (dmgtaken <= 0) {
+                dmgtaken = 1;
+            }
         }
+        beenAttacked = true;
         currentHealth -= dmgtaken;
         gameObject.GetComponentInChildren<TextMeshProUGUI>().text = currentHealth.ToString();
         if (currentHealth > 0) {
@@ -98,7 +101,7 @@ public class TestClass : Character
         else {
             StartCoroutine("DeathAnimation");
             //Fix timer
-            ondeathhandler();
+            ondeathhandler(selfDamage);
         }
     }
 
@@ -121,8 +124,7 @@ public class TestClass : Character
 
     public override bool IsInRange(int targetx, int targety)
     {
-        int dist = 0;
-        dist += Mathf.Abs(targetx - positionx) + Mathf.Abs(targety - positiony);
+        int dist = Mathf.Abs(targetx - positionx) + Mathf.Abs(targety - positiony);
         if (dist >= minrange && dist <= maxrange)
         {
             return true;
@@ -132,7 +134,7 @@ public class TestClass : Character
             return false;
         }
     }
-    
+
     public override List<int[,]> GetAttackRange()
     {
         List<int[,]> retlist = new List<int[,]>();
@@ -146,7 +148,7 @@ public class TestClass : Character
         }
         return retlist;
     }
-    public override void ondeathhandler() //need to wait on this one to decide how summoning is implemented etc
+    public override void ondeathhandler(bool selfDamage = false) //need to wait on this one to decide how summoning is implemented etc
     {
         GameManager gameManager = GameManager.GetSingleton();
         if (currentHealth <= 0)
@@ -156,19 +158,23 @@ public class TestClass : Character
                 List<GameObject> adjacentlist = getadjacent(occupiedTile.GetComponent<TileBehavior>());
                 foreach (GameObject unit in adjacentlist)
                 {
-                    if (unit.GetComponent<TestClass>().faction != "shadow")
+                    if (unit.GetComponent<TestClass>().faction != "Shadow")
                     {
-                        unit.GetComponent<TestClass>().TakeDamage(1);
+                        unit.GetComponent<TestClass>().TakeDamage(3);
                     }
                 }
             }
             if(GameManager.GetSingleton().getCurrent() == 1)
             {
-                gameManager.AddObjPoints(1, cost);
+                if (!selfDamage) {
+                    gameManager.AddObjPoints(1, cost);
+                }
                 gameManager.player1Units.Remove(this.gameObject);
             } else
             {
-                gameManager.AddObjPoints(2, cost);
+                if (!selfDamage) {
+                    gameManager.AddObjPoints(2, cost);
+                }
                 gameManager.player2Units.Remove(this.gameObject);
             }
             gameManager.UpdateUI();
@@ -182,18 +188,28 @@ public class TestClass : Character
         TileBehavior targettile = target.GetComponent<TestClass>().occupiedTile.GetComponent<TileBehavior>();
         int curdmg = damage;
         string targetname = target.GetComponent<TestClass>().unitName;
+        if (unitName == "Amubish") {
+            if (TileBehavior.executableTiles.Contains(target.GetComponent<Character>().occupiedTile)) {
+                target.GetComponent<TestClass>().TakeDamage(99);
+                TakeDamage(99, true);
+                return;
+            }
+        }
         if (unitName == "Tyoudure")
         {
-            List<GameObject> adjacentlist = getadjacent(targettile);
+            List<GameObject> adjacentlist = getadjacent(occupiedTile.GetComponent<TileBehavior>());
             curdmg = 2;
             foreach (GameObject unit in adjacentlist)
             {
-                if (unit.GetComponent<TestClass>().faction == "shadow")
+                if (unit.GetComponent<TestClass>().faction == "Shadow")
                 {
                     curdmg += 1;
                     unit.GetComponent<TestClass>().TakeDamage(1);
                 }
             }
+
+            curdmg += 1;
+            TakeDamage(1);
         }
         if (unitName == "Grunt")
         {
@@ -235,16 +251,16 @@ public class TestClass : Character
             dist += Mathf.Abs(positionx - target.GetComponent<TestClass>().positionx);
             dist += Mathf.Abs(positiony - target.GetComponent<TestClass>().positiony);
             curdmg = dist + 1;
-            if( canMove == false)
+            if (canMove == false)
             {
-                Mathf.Floor(curdmg / 2);
+                curdmg = (int) Mathf.Floor(curdmg / 2);
             }
         }
         if (unitName == "Grasshopper")
         {
             if (distmoved == 4 && canMove == false)
             {
-                curdmg = 4;
+                curdmg = 5;
             }
         }
         if (unitName == "Beetle")

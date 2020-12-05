@@ -172,7 +172,7 @@ SpriteRenderer:
   m_SortingLayerID: 1948701599
   m_SortingLayer: 1
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: 96e9b8435bae02040ba195e654d9b2eb, type: 3}
+  m_Sprite: {fileID: 21300000, guid: b970769798ae2814c83c09cea40b62fb, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -226,6 +226,8 @@ MonoBehaviour:
   xPosition: 0
   yPosition: 0
   tileType: 
+  tileName: 
+  tileDesc: 
   playerside: 0
   tileHighlighter: {fileID: 3427068516729363573}
   playerOpacity: 0.5
@@ -234,6 +236,7 @@ MonoBehaviour:
   ownedBy: 0
   turn: 0
   unitOnPoint: {fileID: 0}
+  unitBool: 0
   captureSounds:
   - {fileID: 8300000, guid: a17c1fbd188addd4d8ef07f2a0ac9245, type: 3}
   - {fileID: 8300000, guid: 1edeb8e2a635e124ea063fc6c8ac9942, type: 3}

@@ -8,7 +8,7 @@ public class HoverButton : MonoBehaviour, IPointerEnterHandler, IPointerClickHan
 
     #region Variables
     public int factionID;
-    private bool disabled;
+    public bool disabled;
     SelectionManager selectionManager;
     #endregion
 

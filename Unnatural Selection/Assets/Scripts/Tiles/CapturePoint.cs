@@ -20,6 +20,8 @@ public class CapturePoint : TileBehavior
     void Awake() {
         base.Awake();
         tileType = "capturepoint";
+        tileName = "Psionic Satellite";
+        tileDesc = "Cost: 1\n\nThere are only a few in this world. Factions gather and fight over control of the satellite to change the climate of the area.";
         audioSource = GetComponent<AudioSource>();
     }
 
@@ -59,8 +61,14 @@ public class CapturePoint : TileBehavior
                         if (unitOnPoint.GetComponent<Character>().faction == "Insect") {
                             GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/insectcap");
                         }
-                        else {
+                        else if (unitOnPoint.GetComponent<Character>().faction == "Mech") {
                             GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/mechcap");
+                        }
+                        else if (unitOnPoint.GetComponent<Character>().faction == "Rock") {
+                            GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/rockcap");
+                        }
+                        else if (unitOnPoint.GetComponent<Character>().faction == "Shadow") {
+                            GetComponent<SpriteRenderer>().sprite = Resources.Load<Sprite>("Sprites/shadowcap");
                         }
                         audioSource.clip = captureSounds[0];
                         audioSource.Play();

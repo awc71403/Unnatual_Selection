@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -13,6 +14,8 @@ public class SelectionManager : MonoBehaviour
     }
 
     [SerializeField]
+    public Image selectionPanel;
+    [SerializeField]
     public Image firstUnit;
     [SerializeField]
     public Image secondUnit;
@@ -23,7 +26,7 @@ public class SelectionManager : MonoBehaviour
     [SerializeField]
     public Image player2Image;
     [SerializeField]
-    public Text factionText;
+    public TextMeshProUGUI factionText;
 
     public UnitCollection unitCollection;
 
@@ -63,28 +66,34 @@ public class SelectionManager : MonoBehaviour
         currentFaction = unitCollection.FactionPicker(currentFactionInt);
         factionText.text = currentFaction[0].GetComponent<Character>().faction;
         firstUnit.sprite = currentFaction[0].GetComponent<Character>().sprite;
-        firstUnit.gameObject.GetComponentsInChildren<Text>()[0].text = currentFaction[0].GetComponent<Character>().unitName;
-        firstUnit.gameObject.GetComponentsInChildren<Text>()[1].text = $"Cost: {currentFaction[0].GetComponent<Character>().cost}\n\nHP: {currentFaction[0].GetComponent<Character>().totalHealth}\nDMG: {currentFaction[0].GetComponent<Character>().damage}\nSpeed: {currentFaction[0].GetComponent<Character>().movement}\n★: {currentFaction[0].GetComponent<Character>().ability}";
+        firstUnit.gameObject.GetComponentsInChildren<TextMeshProUGUI>()[0].text = currentFaction[0].GetComponent<Character>().unitName;
+        firstUnit.gameObject.GetComponentsInChildren<TextMeshProUGUI>()[1].text = $"      - {currentFaction[0].GetComponent<Character>().cost}\n      - {currentFaction[0].GetComponent<Character>().totalHealth}\n      - {currentFaction[0].GetComponent<Character>().damage}\n      - {currentFaction[0].GetComponent<Character>().movement}\n      - {currentFaction[0].GetComponent<Character>().ability}";
 
         secondUnit.sprite = currentFaction[1].GetComponent<Character>().sprite;
-        secondUnit.gameObject.GetComponentsInChildren<Text>()[0].text = currentFaction[1].GetComponent<Character>().unitName;
-        secondUnit.gameObject.GetComponentsInChildren<Text>()[1].text = $"Cost: {currentFaction[1].GetComponent<Character>().cost}\n\nHP: {currentFaction[1].GetComponent<Character>().totalHealth}\nDMG: {currentFaction[1].GetComponent<Character>().damage}\nSpeed: {currentFaction[1].GetComponent<Character>().movement}\n★: {currentFaction[1].GetComponent<Character>().ability}";
+        secondUnit.gameObject.GetComponentsInChildren<TextMeshProUGUI>()[0].text = currentFaction[1].GetComponent<Character>().unitName;
+        secondUnit.gameObject.GetComponentsInChildren<TextMeshProUGUI>()[1].text = $"      - {currentFaction[1].GetComponent<Character>().cost}\n      - {currentFaction[1].GetComponent<Character>().totalHealth}\n      - {currentFaction[1].GetComponent<Character>().damage}\n      - {currentFaction[1].GetComponent<Character>().movement}\n      - {currentFaction[1].GetComponent<Character>().ability}";
 
         thirdUnit.sprite = currentFaction[2].GetComponent<Character>().sprite;
-        thirdUnit.gameObject.GetComponentsInChildren<Text>()[0].text = currentFaction[1].GetComponent<Character>().unitName;
-        thirdUnit.gameObject.GetComponentsInChildren<Text>()[1].text = $"Cost: {currentFaction[2].GetComponent<Character>().cost}\n\nHP: {currentFaction[2].GetComponent<Character>().totalHealth}\nDMG: {currentFaction[2].GetComponent<Character>().damage}\nSpeed: {currentFaction[2].GetComponent<Character>().movement}\n★: {currentFaction[2].GetComponent<Character>().ability}";
+        thirdUnit.gameObject.GetComponentsInChildren<TextMeshProUGUI>()[0].text = currentFaction[2].GetComponent<Character>().unitName;
+        thirdUnit.gameObject.GetComponentsInChildren<TextMeshProUGUI>()[1].text = $"      - {currentFaction[2].GetComponent<Character>().cost}\n      - {currentFaction[2].GetComponent<Character>().totalHealth}\n      - {currentFaction[2].GetComponent<Character>().damage}\n      - {currentFaction[2].GetComponent<Character>().movement}\n      - {currentFaction[2].GetComponent<Character>().ability}";
     }
 
     public void UpdateFactionImage() {
         if (player1Faction == -1) {
             player1Image.enabled = true;
             player1Image.sprite = currentFaction[0].GetComponent<Character>().sprite;
-            player1Image.gameObject.GetComponentInChildren<Text>().text = currentFaction[0].GetComponent<Character>().faction;
+            player1Image.gameObject.GetComponentInChildren<TextMeshProUGUI>().text = currentFaction[0].GetComponent<Character>().faction;
+            player2Image.gameObject.SetActive(false);
+            foreach (HoverButton button in selectionPanel.GetComponentsInChildren<HoverButton>()) {
+                button.gameObject.GetComponent<Image>().color = new Color(1f, 1f, 1f, 1f);
+                button.disabled = false;
+            }
         }
         else {
             player2Image.enabled = true;
             player2Image.sprite = currentFaction[0].GetComponent<Character>().sprite;
-            player2Image.gameObject.GetComponentInChildren<Text>().text = currentFaction[0].GetComponent<Character>().faction;
+            player2Image.gameObject.GetComponentInChildren<TextMeshProUGUI>().text = currentFaction[0].GetComponent<Character>().faction;
+            player2Image.gameObject.SetActive(true);
         }
     }
 
@@ -110,11 +119,18 @@ public class SelectionManager : MonoBehaviour
     public void Begin() {
         PlayerPrefs.SetInt("Player1Faction", player1Faction);
         PlayerPrefs.SetInt("Player2Faction", player2Faction);
+        Destroy(Wind.GetSingleton().gameObject);
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 
     public void Back() {
-        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+        if (player1Faction != -1) {
+            player1Faction = -1;
+            UpdateFactionImage();
+        }
+        else {
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex - 1);
+        }
     }
     #endregion
 }

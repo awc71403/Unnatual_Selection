@@ -11,6 +11,8 @@ public class Rubble : TileBehavior
         base.Awake();
         movementCost = movement;
         tileType = "rubble";
+        tileName = "Rubble";
+        tileDesc = "Cost: 2\n\nThe remains of buildings that have been completely totaled.";
     }
 
     // Update is called once per frame

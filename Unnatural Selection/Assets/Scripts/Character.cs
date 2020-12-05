@@ -57,7 +57,7 @@ public abstract class Character : MonoBehaviour {
     #endregion
 
     #region Abstract
-    public abstract void TakeDamage(int damage);
+    public abstract void TakeDamage(int damage, bool selfDamage = false);
     public abstract void Ability();
     public abstract List<GameObject> getadjacent(TileBehavior tile);
     public abstract void DisplayStats();
@@ -65,7 +65,7 @@ public abstract class Character : MonoBehaviour {
     public abstract void TileToXY(TileBehavior tile);
     public abstract bool IsInRange(int targetx, int targety);
     //public abstract bool IsInMoveRange(int targetx, int targety);
-    public abstract void ondeathhandler();
+    public abstract void ondeathhandler(bool selfDamage = false);
     public abstract void attack(GameObject target);
     //public abstract void move(int targetx, int targety);
     #endregion
@@ -163,7 +163,7 @@ public abstract class Character : MonoBehaviour {
         return occupiedTile;
     }
 
-    public void SetOccupiedTile(GameObject tile) {
+    public virtual void SetOccupiedTile(GameObject tile) {
         occupiedTile = tile;
     }
     #endregion
@@ -210,7 +210,7 @@ public abstract class Character : MonoBehaviour {
 
     IEnumerator DeathAnimation() {
         // loop over 0.5 second backwards
-        print("death time");
+        GetComponentInChildren<TextMeshProUGUI>().gameObject.SetActive(false);
         for (float i = 0.5f; i >= 0; i -= Time.deltaTime) {
             // set color with i as alpha
             myRenderer.color = new Color(1, 1, 1, i);

@@ -109,12 +109,13 @@ MonoBehaviour:
   unitName: Enforcer
   faction: Mech
   desc: I'm broken.
-  ability: More DMG with more range
+  ability: Moving decreases your DMG by half rounded down
   sprite: {fileID: 21300000, guid: 7873691ce491277478583e112c3d9f0a, type: 3}
   player: 0
   canMove: 1
   canAttack: 1
-  attacked: 0
+  hasAttacked: 0
+  beenAttacked: 0
   occupiedTile: {fileID: 0}
   previousTile: {fileID: 0}
   damageTextPrefab: {fileID: 8449641663928675022, guid: 88267e090c2a05f4480eda9e9f32f63d,

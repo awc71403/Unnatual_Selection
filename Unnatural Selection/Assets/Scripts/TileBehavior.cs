@@ -5,21 +5,14 @@ using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using System;
 
-public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler {
+public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPointerDownHandler, IPointerUpHandler, IPointerEnterHandler {
     #region Selection Variables
     static List<GameObject> highlightedTiles = new List<GameObject>();
     static List<GameObject> moveableTiles = new List<GameObject>();
+    public static List<GameObject> executableTiles = new List<GameObject>();
     public static GameObject selectedUnit;
     public static GameObject selectedTile;
     protected static string selectionState;
-    #endregion
-
-    #region UI Variables    
-    public static float tileDim;
-    public static Button attackButton;
-    public static Button abilityButton;
-    public static Button useRollButton;
-    public static GameObject diceAttack;
     #endregion
 
     #region Instance Variables
@@ -29,6 +22,8 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
     public int xPosition;
     public int yPosition;
     public string tileType;
+    public string tileName;
+    public string tileDesc;
     public int playerside;
 
     [SerializeField]
@@ -42,6 +37,8 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
     AudioSource audioSource;
 
     float stepDuration = 0.1f;
+
+    public static float tileDim;
     #endregion
 
     #region Initialization
@@ -110,69 +107,63 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
     #endregion
 
     #region Highlight Functions
-    public void HighlightCanMove(bool enemySelect = false) {
+    public void HighlightCanMove() {
         tileHighlighterAnimator.SetBool("canAttack", false);
         tileHighlighterAnimator.SetBool("canMove", true);
         tileHighlighterAnimator.SetBool("selected", false);
-        tileHighlighterAnimator.SetBool("enemySelected", enemySelect);
-        if (enemySelect) {
-            setHighlightOpacity(enemyOpacity);
-        }
-        else {
-            setHighlightOpacity(playerOpacity);
-        }
+        tileHighlighterAnimator.SetBool("canExecute", false);
+        tileHighlighterAnimator.SetBool("canSpawn", false);
+
+        setHighlightOpacity(playerOpacity);
         highlighted = true;
     }
 
-    public void HighlightCanMoveCovered(bool enemySelect = false) {
+    public void HighlightCanMoveCovered() {
         tileHighlighterAnimator.SetBool("canAttack", false);
         tileHighlighterAnimator.SetBool("canMove", true);
         tileHighlighterAnimator.SetBool("selected", false);
-        tileHighlighterAnimator.SetBool("enemySelected", enemySelect);
-        if (enemySelect) {
-            setHighlightOpacity(enemyOpacity / 2f);
-        }
-        else {
-            setHighlightOpacity(playerOpacity / 2f);
-        }
-        highlighted = true;
-    }
+        tileHighlighterAnimator.SetBool("canExecute", false);
+        tileHighlighterAnimator.SetBool("canSpawn", false);
 
-    public void HighlightCanAttack(bool enemySelect = false) {
-        tileHighlighterAnimator.SetBool("canAttack", true);
-        tileHighlighterAnimator.SetBool("canMove", false);
-        tileHighlighterAnimator.SetBool("selected", false);
-        tileHighlighterAnimator.SetBool("enemySelected", false);
-        highlighted = true;
-        if (enemySelect) {
-            setHighlightOpacity(enemyOpacity + 0.1f);
-        }
-        else {
-            setHighlightOpacity(playerOpacity + 0.1f);
-        }
-    }
-
-    public void HighlightCanAttackEmpty(bool enemySelect = false) {
-        tileHighlighterAnimator.SetBool("canAttack", true);
-        tileHighlighterAnimator.SetBool("canMove", false);
-        tileHighlighterAnimator.SetBool("selected", false);
-        tileHighlighterAnimator.SetBool("enemySelected", false);
         setHighlightOpacity(playerOpacity / 2f);
         highlighted = true;
-        if (enemySelect) {
-            setHighlightOpacity(enemyOpacity / 2f);
-        }
-        else {
-            setHighlightOpacity(playerOpacity / 2f);
-        }
+    }
+
+    public void HighlightCanAttack() {
+        tileHighlighterAnimator.SetBool("canAttack", true);
+        tileHighlighterAnimator.SetBool("canMove", false);
+        tileHighlighterAnimator.SetBool("selected", false);
+        tileHighlighterAnimator.SetBool("canExecute", false);
+        tileHighlighterAnimator.SetBool("canSpawn", false);
+        highlighted = true;
+
+        setHighlightOpacity(playerOpacity + 0.1f);
+        
+    }
+
+    public void HighlightCanAttackEmpty() {
+        tileHighlighterAnimator.SetBool("canAttack", true);
+        tileHighlighterAnimator.SetBool("canMove", false);
+        tileHighlighterAnimator.SetBool("selected", false);
+        tileHighlighterAnimator.SetBool("canExecute", false);
+        tileHighlighterAnimator.SetBool("canSpawn", false);
+        setHighlightOpacity(playerOpacity / 2f);
+        highlighted = true;
+
+        setHighlightOpacity(playerOpacity / 2f);
+    }
+
+    public void HighlightCanExecute() {
+        tileHighlighterAnimator.SetBool("canExecute", true);
+
+        setHighlightOpacity(playerOpacity);
+        highlighted = true;
     }
 
     public void HighlightCanSpawn() {
-        tileHighlighterAnimator.SetBool("canAttack", true);
-        tileHighlighterAnimator.SetBool("canMove", true);
-        tileHighlighterAnimator.SetBool("selected", false);
-        tileHighlighterAnimator.SetBool("enemySelected", false);
+        tileHighlighterAnimator.SetBool("canSpawn", true);
         highlighted = true;
+
         setHighlightOpacity(playerOpacity);
     }
 
@@ -180,7 +171,8 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
         tileHighlighterAnimator.SetBool("canAttack", false);
         tileHighlighterAnimator.SetBool("canMove", false);
         tileHighlighterAnimator.SetBool("selected", true);
-        tileHighlighterAnimator.SetBool("enemySelected", false);
+        tileHighlighterAnimator.SetBool("canExecute", false);
+        tileHighlighterAnimator.SetBool("canSpawn", false);
         setHighlightOpacity(playerOpacity);
     }
 
@@ -188,52 +180,36 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
         tileHighlighterAnimator.SetBool("canAttack", false);
         tileHighlighterAnimator.SetBool("canMove", false);
         tileHighlighterAnimator.SetBool("selected", false);
-        tileHighlighterAnimator.SetBool("enemySelected", false);
+        tileHighlighterAnimator.SetBool("canExecute", false);
+        tileHighlighterAnimator.SetBool("canSpawn", false);
         highlighted = false;
         setHighlightOpacity(playerOpacity);
     }
     #endregion
 
     #region Highlight Valid Tiles Functions
-    void HighlightMoveableTiles(int moveEnergy) {
-        // Don't do anything if you've run out of energy.
-        if (moveEnergy < 0 || tileType == "nexus") {
-            return;
-        }
 
-        //Otherwise, hightlight yourself...
-        if (myUnit == null) {
-            HighlightCanMove();
-        }
-        else if (!myUnit.Equals(selectedUnit)) {
-            HighlightCanMoveCovered();
-        }
-        highlightedTiles.Add(gameObject);
-
-        //...and all adjacent tiles (if they don't contain enemy units).
-
-        Vector2[] directions = { Vector2.right, Vector2.left, Vector2.up, Vector2.down };
-        foreach (Vector2 direction in directions) {
-            RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, 1.0f);
-            if (hit.collider != null) {
-                TileBehavior otherTile = hit.transform.GetComponent<TileBehavior>();
-                int cent = 0;
-                List<GameObject> adjacentlist = getadjacent(otherTile);
-                foreach (GameObject unit in adjacentlist)
-                {
-                    if (unit.GetComponent<TestClass>().unitName == "Centurion")
-                    {
-                        cent = 1;
-                    }
-                }
-                if (otherTile.myUnit == null || otherTile.myUnit.GetComponent<Character>().player == selectedUnit.GetComponent<Character>().player) {
-                    hit.transform.GetComponent<TileBehavior>().HighlightMoveableTiles(moveEnergy - otherTile.movementCost - cent);
+    void HighlightAttackableTiles(GameObject unit) {
+        if (unit.GetComponent<Character>().unitName == "Amubish") {
+            List<GameObject> units;
+            GameManager gameManager = GameManager.GetSingleton();
+            if (GameManager.currentPlayer == 1) {
+                units = gameManager.player2Units;
+            }
+            else {
+                units = gameManager.player1Units;
+            }
+            foreach (GameObject enemy in units) {
+                Character enemyCharacter = enemy.GetComponent<Character>();
+                float hpPercent = (float) enemyCharacter.currentHealth / (float) enemyCharacter.totalHealth;
+                if (hpPercent <= .4f) {
+                    highlightedTiles.Add(enemyCharacter.occupiedTile);
+                    executableTiles.Add(enemyCharacter.occupiedTile);
+                    enemyCharacter.occupiedTile.GetComponent<TileBehavior>().HighlightCanExecute();
                 }
             }
         }
-    }
 
-    void HighlightAttackableTiles(GameObject unit, bool enemySelect = false) {
         List<int[,]> attackRanges = unit.GetComponent<Character>().GetAttackRange();
         float tileSize = GetComponent<SpriteRenderer>().sprite.bounds.size.x;
 
@@ -255,31 +231,70 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
                         GameObject hitUnit = hit.gameObject.GetComponent<TileBehavior>().GetUnit();
                         if (hitUnit.GetComponent<Character>().GetPlayer() != selectedUnit.GetComponent<Character>().GetPlayer()) {
                             // Stop. Go no further in this direction.
-                            hit.gameObject.GetComponent<TileBehavior>().HighlightCanAttack(enemySelect);
+                            hit.gameObject.GetComponent<TileBehavior>().HighlightCanAttack();
                             break;
 
                         }
                         // And the unit belongs to the player team...
                         else {
                             // Keep going.
-                            hit.gameObject.GetComponent<TileBehavior>().HighlightCanAttackEmpty(enemySelect);
+                            hit.gameObject.GetComponent<TileBehavior>().HighlightCanAttackEmpty();
                         }
                     }
                     // If that tile is a wall...
                     else {
                         // Keep going.
-                        hit.gameObject.GetComponent<TileBehavior>().HighlightCanAttackEmpty(enemySelect);
+                        hit.gameObject.GetComponent<TileBehavior>().HighlightCanAttackEmpty();
                     }
                 }
             }
         }
     }
 
-    void HighlightRange(int moveEnergy, int attackRange) {
+    void HighlightRange(int moveEnergy, int maxRange) {
+        if (selectedUnit.GetComponent<Character>().unitName == "Amubish") {
+            List<GameObject> units;
+            GameManager gameManager = GameManager.GetSingleton();
+            if (GameManager.currentPlayer == 1) {
+                units = gameManager.player2Units;
+            }
+            else {
+                units = gameManager.player1Units;
+            }
+            foreach (GameObject enemy in units) {
+                Character enemyCharacter = enemy.GetComponent<Character>();
+                float hpPercent = (float) enemyCharacter.currentHealth / (float) enemyCharacter.totalHealth;
+                if (hpPercent <= .4f) {
+                    highlightedTiles.Add(enemyCharacter.occupiedTile);
+                    executableTiles.Add(enemyCharacter.occupiedTile);
+                    enemyCharacter.occupiedTile.GetComponent<TileBehavior>().HighlightCanExecute();
+                }
+            }
+        }
+
         HighlightRangeMovement(moveEnergy);
+
+        List<int[,]> attackRanges = new List<int[,]>();
+        if (selectedUnit.GetComponent<Character>().unitName == "Enforcer") {
+            Character enforcer = selectedUnit.GetComponent<Character>();
+            for (int x = -enforcer.maxrange; x <= enforcer.maxrange; x++) {
+                for (int y = -enforcer.maxrange; y <= enforcer.maxrange; y++) {
+                    if (Mathf.Abs(x) + Mathf.Abs(y) >= enforcer.minrange && Mathf.Abs(x) + Mathf.Abs(y) <= enforcer.maxrange) {
+                        int[,] inRange = { { x, y } };
+                        attackRanges.Add(inRange);
+                    }
+                }
+            }
+        }
+
         foreach (GameObject tileObject in moveableTiles) {
             TileBehavior tile = tileObject.GetComponent<TileBehavior>();
-            tile.HighlightRangeAttack(attackRange);
+            if (selectedUnit.GetComponent<Character>().unitName == "Enforcer") {
+                HighlightEnforcerAttack(selectedUnit.GetComponent<Character>(), tile, attackRanges);
+            }
+            else {
+                tile.HighlightRangeAttack(selectedUnit.GetComponent<Character>(), tile, maxRange);
+            }
         }
     }
 
@@ -306,33 +321,85 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
             RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, 1.0f);
             if (hit.collider != null) {
                 TileBehavior otherTile = hit.transform.GetComponent<TileBehavior>();
+                int cent = 0;
+                List<GameObject> adjacentlist = getadjacent(otherTile);
+                foreach (GameObject unit in adjacentlist) {
+                    if (unit.GetComponent<Character>().unitName == "Centurion" && selectedUnit.GetComponent<Character>().faction != "Mech") {
+                        cent = 1;
+                    }
+                }
                 int extra = 0;
                 if (otherTile.myUnit == null || otherTile.myUnit.GetComponent<Character>().player == selectedUnit.GetComponent<Character>().player) {
                     if (otherTile.tileType == "sand") {
-                        extra = (int)Math.Ceiling((decimal)myUnit.GetComponent<Character>().cost / 3);
-                        if (moveEnergy - otherTile.movementCost - extra < 0) {
-                            hit.transform.GetComponent<TileBehavior>().HighlightRangeMovement(0);
+                        extra = (int)Math.Ceiling((decimal)selectedUnit.GetComponent<Character>().cost / 3) - 1;
+                        if (moveEnergy > 0 && moveEnergy - otherTile.movementCost - extra - cent < 0) {
+                            otherTile.HighlightRangeMovement(0);
                         }
                         else {
-                            hit.transform.GetComponent<TileBehavior>().HighlightRangeMovement(moveEnergy - otherTile.movementCost - extra);
+                            otherTile.HighlightRangeMovement(moveEnergy - otherTile.movementCost - extra - cent);
                         }
                     }
                     else {
-                        hit.transform.GetComponent<TileBehavior>().HighlightRangeMovement(moveEnergy - otherTile.movementCost);
+                        otherTile.HighlightRangeMovement(moveEnergy - otherTile.movementCost - cent);
                     }
                 }
             }
         }
     }
 
-    void HighlightRangeAttack(int attackRange) {
+    void HighlightEnforcerAttack(Character unit, TileBehavior originalTile, List<int[,]> attackRanges) {
+        float tileSize = GetComponent<SpriteRenderer>().sprite.bounds.size.x;
+
+        foreach (int[,] attackRange in attackRanges) {
+            for (int i = 0; i < attackRange.GetLength(0); i++) {
+                Vector3 xOffSet = new Vector3(tileSize, 0.0f, 0.0f) * attackRange[i, 0];
+                Vector3 yOffSet = new Vector3(0.0f, tileSize, 0.0f) * attackRange[i, 1];
+                Vector2 tilePosition = originalTile.transform.position + xOffSet + yOffSet;
+                Collider2D hit = Physics2D.OverlapPoint(tilePosition);
+
+                // If there exists a tile in that direction...
+                if (hit != null) {
+                    // Highlight that tile.
+                    highlightedTiles.Add(hit.gameObject);
+
+                    // If that tile has a unit...
+                    if (hit.gameObject.GetComponent<TileBehavior>().HasUnit()) {
+                        // And the unit belongs to the enemy team...
+                        GameObject hitUnit = hit.gameObject.GetComponent<TileBehavior>().GetUnit();
+                        if (hitUnit.GetComponent<Character>().GetPlayer() != selectedUnit.GetComponent<Character>().GetPlayer()) {
+                            hit.gameObject.GetComponent<TileBehavior>().HighlightCanAttack();
+                        }
+                        // And the unit belongs to the player team...
+                        else {
+                            // Keep going.
+                            hit.gameObject.GetComponent<TileBehavior>().HighlightCanAttackEmpty();
+                        }
+                    }
+                    else {
+                        // Keep going.
+                        hit.gameObject.GetComponent<TileBehavior>().HighlightCanAttackEmpty();
+                    }
+                }
+            }
+        }
+    }
+
+    void HighlightRangeAttack(Character unit, TileBehavior originalTile, int attackRange) {
         if (attackRange < 0) {
             return;
         }
 
-        if (!highlighted) {
-            HighlightCanAttack();
-            highlightedTiles.Add(gameObject);
+        int dist = Mathf.Abs(xPosition - originalTile.xPosition) + Mathf.Abs(yPosition - originalTile.yPosition);
+        if (dist >= unit.minrange && dist <= unit.maxrange) {
+            if (!highlighted) {
+                if (myUnit != null && myUnit.GetComponent<Character>().GetPlayer() != selectedUnit.GetComponent<Character>().GetPlayer()) {
+                    HighlightCanAttack();
+                }
+                else {
+                    HighlightCanAttackEmpty();
+                }
+                highlightedTiles.Add(gameObject);
+            }
         }
 
         Vector2[] directions = { Vector2.right, Vector2.left, Vector2.up, Vector2.down };
@@ -340,9 +407,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
             RaycastHit2D hit = Physics2D.Raycast(transform.position, direction, 1.0f);
             if (hit.collider != null) {
                 TileBehavior otherTile = hit.transform.GetComponent<TileBehavior>();
-                if (!moveableTiles.Contains(otherTile.gameObject) || !highlightedTiles.Contains(otherTile.gameObject)) {
-                    hit.transform.GetComponent<TileBehavior>().HighlightRangeAttack(attackRange - 1);
-                }
+                hit.transform.GetComponent<TileBehavior>().HighlightRangeAttack(unit, originalTile, attackRange - 1);
             }
         }
     }
@@ -353,7 +418,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
         }
         if (tileType != "nexus" && myUnit == null) {
             //Change to something else once we have the code/art
-            HighlightCanMove();
+            HighlightCanSpawn();
         }
         highlightedTiles.Add(gameObject);
         Vector2[] directions = { Vector2.right, Vector2.left, Vector2.up, Vector2.down };
@@ -378,9 +443,8 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
         // If nothing is currently selected...
         if (selectionState == null) {
             // and if it was a right click...
-            if (data.button == PointerEventData.InputButton.Right) {
-                Debug.Log($"This tile is a {tileType} tile");
-                GameManager.GetSingleton().ShowCharacterUI(myUnit);
+            if (data.button == PointerEventData.InputButton.Right && GameManager.infoOpened == false) {
+                GameManager.GetSingleton().ShowInfoUI(myUnit, this);
             }
             // and if the tile is your Nexus
             else if (tileType == "nexus" && playerside == GameManager.currentPlayer) {
@@ -395,7 +459,6 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
                 //}
                 // and the unit's player is equal to to the current player...
                 if (GameManager.currentPlayer.Equals(myUnit.GetComponent<Character>().GetPlayer()) && myUnit.GetComponent<Character>().GetCanMove() == true) {
-                    GameManager.GetSingleton().ShowCharacterUI(myUnit);
                     // select that unit/tile and highlight the tiles that the unit can move to (if it can move).
                     SelectionStateToMove();
                 }
@@ -420,7 +483,6 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
                 if (highlighted && myUnit == null && moveableTiles.Contains(gameObject)) {
                     // move that character onto this tile and dehighlight everything.
                     selectedTile.GetComponent<TileBehavior>().ClearUnit();
-                    // attack here
                     StartCoroutine(MoveUnitToThisTile(selectedUnit, selectedTile));
                 }
 
@@ -469,8 +531,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
                 // and if the tile is the enemy's Nexus
                 else if (highlighted && tileType == "nexus" && playerside != GameManager.currentPlayer)
                 {
-                    GameManager gameManager = GameManager.GetSingleton();
-                    gameManager.AddNexusObjectivePoints();
+                    GetComponent<Nexus>().Damaged();
                     selectedUnit.GetComponent<Character>().SetCanMove(false);
                     selectedUnit.GetComponent<Character>().SetCanAttack(false);
                     SelectionStateToNull();
@@ -528,6 +589,15 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
             selectionState = null;
         }
     }
+
+    public void OnPointerEnter(PointerEventData eventData) {
+        if (myUnit != null && !GameManager.menuOpened) {
+            GameManager.GetSingleton().ShowCharacterUI(myUnit);
+        }
+        else {
+            GameManager.GetSingleton().unitUI.SetActive(false);
+        }
+    }
     #endregion
 
     #region Selection State To Functions
@@ -539,9 +609,6 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
     public void SelectionStateToSummon() {
         // Deselect everything else
         Deselect();
-
-        GameManager gameManager = GameManager.GetSingleton();
-        gameManager.endButton.gameObject.SetActive(false);
 
         // Switch selection state to summon
         selectionState = "summoning";

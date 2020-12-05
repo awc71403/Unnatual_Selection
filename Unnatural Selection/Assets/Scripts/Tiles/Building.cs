@@ -11,6 +11,8 @@ public class Building : TileBehavior
         base.Awake();
         movementCost = movement;
         tileType = "building";
+        tileName = "Building";
+        tileDesc = "Cost: 3\n\nUsed to be tall beautiful skyscrapers. Now just an obstacle.";
     }
 
     // Update is called once per frame
