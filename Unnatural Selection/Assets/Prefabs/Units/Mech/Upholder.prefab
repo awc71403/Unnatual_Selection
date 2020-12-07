@@ -109,8 +109,9 @@ MonoBehaviour:
   unitName: Upholder
   faction: Mech
   desc: Please use me.
-  ability: Heals 1 HP at the beginning of your turn
+  ability: Heals 1 HP at the beginning of your turn.
   sprite: {fileID: 21300000, guid: ebfd9173e7715f2448f19542e9722fda, type: 3}
+  factionSprite: {fileID: 21300000, guid: 7c0b75ec2fde75f4a8dddbb601f6d416, type: 3}
   player: 0
   canMove: 1
   canAttack: 1

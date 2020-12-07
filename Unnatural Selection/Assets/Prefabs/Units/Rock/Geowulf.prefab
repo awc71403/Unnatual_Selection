@@ -109,8 +109,9 @@ MonoBehaviour:
   unitName: Geowulf
   faction: Rock
   desc: Beetles hate me.
-  ability: Deals 1 DMG to adjacent units of target enemy
+  ability: Adjacent enemies to target take 1 DMG.
   sprite: {fileID: 21300000, guid: 7a423b423086f5640852cb4618e3c376, type: 3}
+  factionSprite: {fileID: 21300000, guid: 8eb1463f6bad6e44aa19e547bc3d916a, type: 3}
   player: 0
   canMove: 1
   canAttack: 1

@@ -76,7 +76,7 @@ public class TestClass : Character
             List<GameObject> adjacentlist = getadjacent(occupiedTile.GetComponent<TileBehavior>());
             foreach (GameObject unit in adjacentlist)
             {
-                if (unit.GetComponent<TestClass>().unitName == "Bouldef")
+                if (unit.GetComponent<TestClass>().unitName == "Bouldef" && unitName != "Bouldef")
                 {
                     lorge = true;
                 }
@@ -87,10 +87,7 @@ public class TestClass : Character
             }
         }
         if (occupiedTile.GetComponent<TileBehavior>().tileType == "barricade" && !beenAttacked) {
-            dmgtaken = (int) Mathf.Floor(dmgtaken / 2);
-            if (dmgtaken <= 0) {
-                dmgtaken = 1;
-            }
+            dmgtaken = 0;
         }
         beenAttacked = true;
         currentHealth -= dmgtaken;
@@ -160,7 +157,7 @@ public class TestClass : Character
                 {
                     if (unit.GetComponent<TestClass>().faction != "Shadow")
                     {
-                        unit.GetComponent<TestClass>().TakeDamage(3);
+                        unit.GetComponent<TestClass>().TakeDamage(4);
                     }
                 }
             }
@@ -260,7 +257,7 @@ public class TestClass : Character
         {
             if (distmoved == 4 && canMove == false)
             {
-                curdmg = 5;
+                curdmg = 6;
             }
         }
         if (unitName == "Beetle")

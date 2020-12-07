@@ -109,8 +109,9 @@ MonoBehaviour:
   unitName: Grunt
   faction: Insect
   desc: I'm an ant.
-  ability: +1 DMG for each adjacent ally to enemy
+  ability: +1 DMG for each adjacent ally to enemy.
   sprite: {fileID: 21300000, guid: db68afba1087c4c448497ea53aeb59da, type: 3}
+  factionSprite: {fileID: 21300000, guid: df1e3a0a0544b7343811db0ffb04f0fb, type: 3}
   player: 0
   canMove: 1
   canAttack: 1

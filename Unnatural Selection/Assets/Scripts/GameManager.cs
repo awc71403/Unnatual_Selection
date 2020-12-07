@@ -95,6 +95,9 @@ public class GameManager : MonoBehaviour
     public TextMeshProUGUI player1ReserveText;
     public TextMeshProUGUI player2ReserveText;
 
+    public Image player1FactionImage;
+    public Image player2FactionImage;
+
     private float player1Reserve;
     private float player2Reserve;
 
@@ -129,6 +132,8 @@ public class GameManager : MonoBehaviour
 
         timeRemaining = timer;
 
+        menuOpened = false;
+
         tileSize = tilePrefabs[0].GetComponent<SpriteRenderer>().sprite.bounds.size.x;
         CreateTiles();
     }
@@ -148,7 +153,9 @@ public class GameManager : MonoBehaviour
 
         player1FactionName = player1Faction[0].GetComponent<Character>().faction;
         player2FactionName = player2Faction[0].GetComponent<Character>().faction;
-        Debug.Log(player1NexusStrikesUI.GetComponentsInChildren<Image>().Length);
+
+        player1FactionImage.sprite = player1Faction[0].GetComponent<Character>().factionSprite;
+        player2FactionImage.sprite = player2Faction[0].GetComponent<Character>().factionSprite;
         switch (player1FactionName) {
             case "Insect":
                 player1ObjSlider.GetComponentsInChildren<Image>()[1].color = new Color(1, 0, 0);
@@ -454,6 +461,7 @@ public class GameManager : MonoBehaviour
         //Unhighlight everything
         TileBehavior.Deselect();
         boughtUnit = null;
+        menuOpened = false;
         SummonPanel.gameObject.SetActive(false);
     }
 
@@ -497,12 +505,12 @@ public class GameManager : MonoBehaviour
 
     public void UpdateUI() {
         if (currentPlayer == 1) {
-            player1EnergyText.text = $"Energy: {player1Energy.ToString()}";
+            player1EnergyText.text = $"- {player1Energy.ToString()}";
             player1PlayerUI.gameObject.GetComponent<Image>().color = new Color(1f, 1f, 0f);
             player2PlayerUI.gameObject.GetComponent<Image>().color = new Color(1f, 1f, 1f);
         }
         else {
-            player2EnergyText.text = $"Energy: {player2Energy.ToString()}";
+            player2EnergyText.text = $"- {player2Energy.ToString()}";
             player1PlayerUI.gameObject.GetComponent<Image>().color = new Color(1f, 1f, 1f);
             player2PlayerUI.gameObject.GetComponent<Image>().color = new Color(1f, 1f, 0f);
         }

@@ -72,7 +72,7 @@ SpriteRenderer:
   m_SortingLayerID: 1563144509
   m_SortingLayer: 3
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: fd789d7e028318e4a891d88ad80c005c, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 21a3a7dd7f8a5684f9570b2390602719, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -109,8 +109,9 @@ MonoBehaviour:
   unitName: Keresu
   faction: Shadow
   desc: Beetles hate me.
-  ability: Deals 3 DMG to adjacent enemies on death
-  sprite: {fileID: 21300000, guid: fd789d7e028318e4a891d88ad80c005c, type: 3}
+  ability: Deals 4 DMG to adjacent enemies on death.
+  sprite: {fileID: 21300000, guid: 21a3a7dd7f8a5684f9570b2390602719, type: 3}
+  factionSprite: {fileID: 21300000, guid: 3cfda07a492feb74b9eeaaa221d69d47, type: 3}
   player: 0
   canMove: 1
   canAttack: 1

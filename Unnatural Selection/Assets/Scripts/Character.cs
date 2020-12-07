@@ -25,6 +25,7 @@ public abstract class Character : MonoBehaviour {
     public string desc;
     public string ability;
     public Sprite sprite;
+    public Sprite factionSprite;
 
     public int player;
 

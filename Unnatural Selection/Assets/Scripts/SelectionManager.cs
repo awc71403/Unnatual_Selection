@@ -81,7 +81,7 @@ public class SelectionManager : MonoBehaviour
     public void UpdateFactionImage() {
         if (player1Faction == -1) {
             player1Image.enabled = true;
-            player1Image.sprite = currentFaction[0].GetComponent<Character>().sprite;
+            player1Image.sprite = currentFaction[0].GetComponent<Character>().factionSprite;
             player1Image.gameObject.GetComponentInChildren<TextMeshProUGUI>().text = currentFaction[0].GetComponent<Character>().faction;
             player2Image.gameObject.SetActive(false);
             foreach (HoverButton button in selectionPanel.GetComponentsInChildren<HoverButton>()) {
@@ -91,7 +91,7 @@ public class SelectionManager : MonoBehaviour
         }
         else {
             player2Image.enabled = true;
-            player2Image.sprite = currentFaction[0].GetComponent<Character>().sprite;
+            player2Image.sprite = currentFaction[0].GetComponent<Character>().factionSprite;
             player2Image.gameObject.GetComponentInChildren<TextMeshProUGUI>().text = currentFaction[0].GetComponent<Character>().faction;
             player2Image.gameObject.SetActive(true);
         }
@@ -119,7 +119,9 @@ public class SelectionManager : MonoBehaviour
     public void Begin() {
         PlayerPrefs.SetInt("Player1Faction", player1Faction);
         PlayerPrefs.SetInt("Player2Faction", player2Faction);
-        Destroy(Wind.GetSingleton().gameObject);
+        if (Wind.GetSingleton()) {
+            Destroy(Wind.GetSingleton().gameObject);
+        }
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex + 1);
     }
 

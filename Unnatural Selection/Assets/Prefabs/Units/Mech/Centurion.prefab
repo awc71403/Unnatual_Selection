@@ -109,8 +109,9 @@ MonoBehaviour:
   unitName: Centurion
   faction: Mech
   desc: Beetles hate me.
-  ability: Adjacent tiles cost 1 more movement for enemies
+  ability: Adjacent tiles cost 1 more movement for enemies.
   sprite: {fileID: 21300000, guid: 5319204a7f14cb84fa624fc9634635df, type: 3}
+  factionSprite: {fileID: 21300000, guid: 7c0b75ec2fde75f4a8dddbb601f6d416, type: 3}
   player: 0
   canMove: 1
   canAttack: 1

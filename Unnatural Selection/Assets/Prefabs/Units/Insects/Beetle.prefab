@@ -109,8 +109,9 @@ MonoBehaviour:
   unitName: Beetle
   faction: Insect
   desc: I flip.
-  ability: Attacks flip enemies behind you if possible
+  ability: Attacks flip enemies behind you if possible.
   sprite: {fileID: 21300000, guid: 8c2cc1407f37ce742beedc3bb036d5a7, type: 3}
+  factionSprite: {fileID: 21300000, guid: df1e3a0a0544b7343811db0ffb04f0fb, type: 3}
   player: 0
   canMove: 1
   canAttack: 1

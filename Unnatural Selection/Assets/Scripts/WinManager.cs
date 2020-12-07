@@ -24,6 +24,7 @@ public class WinManager : MonoBehaviour
                 unit1.sprite = unitCollection.insectFaction[0].GetComponent<Character>().sprite;
                 unit2.sprite = unitCollection.insectFaction[1].GetComponent<Character>().sprite;
                 unit3.sprite = unitCollection.insectFaction[2].GetComponent<Character>().sprite;
+                faction.sprite = unitCollection.insectFaction[0].GetComponent<Character>().factionSprite;
 
                 satellite.sprite = Resources.Load<Sprite>("Sprites/insectcapwin");
 
@@ -34,6 +35,7 @@ public class WinManager : MonoBehaviour
                 unit1.sprite = unitCollection.mechFaction[0].GetComponent<Character>().sprite;
                 unit2.sprite = unitCollection.mechFaction[1].GetComponent<Character>().sprite;
                 unit3.sprite = unitCollection.mechFaction[2].GetComponent<Character>().sprite;
+                faction.sprite = unitCollection.mechFaction[0].GetComponent<Character>().factionSprite;
 
                 satellite.sprite = Resources.Load<Sprite>("Sprites/mechcapwin");
 
@@ -44,6 +46,7 @@ public class WinManager : MonoBehaviour
                 unit1.sprite = unitCollection.rockFaction[0].GetComponent<Character>().sprite;
                 unit2.sprite = unitCollection.rockFaction[1].GetComponent<Character>().sprite;
                 unit3.sprite = unitCollection.rockFaction[2].GetComponent<Character>().sprite;
+                faction.sprite = unitCollection.rockFaction[0].GetComponent<Character>().factionSprite;
 
                 satellite.sprite = Resources.Load<Sprite>("Sprites/rockcapwin");
 
@@ -54,6 +57,7 @@ public class WinManager : MonoBehaviour
                 unit1.sprite = unitCollection.shadowFaction[0].GetComponent<Character>().sprite;
                 unit2.sprite = unitCollection.shadowFaction[1].GetComponent<Character>().sprite;
                 unit3.sprite = unitCollection.shadowFaction[2].GetComponent<Character>().sprite;
+                faction.sprite = unitCollection.shadowFaction[0].GetComponent<Character>().factionSprite;
 
                 satellite.sprite = Resources.Load<Sprite>("Sprites/shadowcapwin");
 

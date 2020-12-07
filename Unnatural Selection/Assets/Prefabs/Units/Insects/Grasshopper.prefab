@@ -109,8 +109,9 @@ MonoBehaviour:
   unitName: Grasshopper
   faction: Insect
   desc: Please fix me.
-  ability: At max distance, +2 DMG
+  ability: At max movement distance, +3 DMG.
   sprite: {fileID: 21300000, guid: 3bad85fb78d83834e97e8ad21045c96e, type: 3}
+  factionSprite: {fileID: 21300000, guid: df1e3a0a0544b7343811db0ffb04f0fb, type: 3}
   player: 0
   canMove: 1
   canAttack: 1

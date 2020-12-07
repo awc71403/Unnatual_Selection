@@ -138,7 +138,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
         highlighted = true;
 
         setHighlightOpacity(playerOpacity + 0.1f);
-        
+
     }
 
     public void HighlightCanAttackEmpty() {
@@ -201,7 +201,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
             }
             foreach (GameObject enemy in units) {
                 Character enemyCharacter = enemy.GetComponent<Character>();
-                float hpPercent = (float) enemyCharacter.currentHealth / (float) enemyCharacter.totalHealth;
+                float hpPercent = (float)enemyCharacter.currentHealth / (float)enemyCharacter.totalHealth;
                 if (hpPercent <= .4f) {
                     highlightedTiles.Add(enemyCharacter.occupiedTile);
                     executableTiles.Add(enemyCharacter.occupiedTile);
@@ -263,7 +263,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
             }
             foreach (GameObject enemy in units) {
                 Character enemyCharacter = enemy.GetComponent<Character>();
-                float hpPercent = (float) enemyCharacter.currentHealth / (float) enemyCharacter.totalHealth;
+                float hpPercent = (float)enemyCharacter.currentHealth / (float)enemyCharacter.totalHealth;
                 if (hpPercent <= .4f) {
                     highlightedTiles.Add(enemyCharacter.occupiedTile);
                     executableTiles.Add(enemyCharacter.occupiedTile);
@@ -305,7 +305,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
         }
 
         //Otherwise, hightlight yourself...
-        if (myUnit == null || myUnit.Equals(selectedUnit)) {
+        if (myUnit == null || myUnit.Equals(selectedUnit) || myUnit.GetComponent<Character>().currentHealth < 0) {
             HighlightCanMove();
             moveableTiles.Add(gameObject);
         }
@@ -329,7 +329,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
                     }
                 }
                 int extra = 0;
-                if (otherTile.myUnit == null || otherTile.myUnit.GetComponent<Character>().player == selectedUnit.GetComponent<Character>().player) {
+                if (otherTile.myUnit == null || otherTile.myUnit.GetComponent<Character>().player == selectedUnit.GetComponent<Character>().player || otherTile.myUnit.GetComponent<Character>().currentHealth < 0) {
                     if (otherTile.tileType == "sand") {
                         extra = (int)Math.Ceiling((decimal)selectedUnit.GetComponent<Character>().cost / 3) - 1;
                         if (moveEnergy > 0 && moveEnergy - otherTile.movementCost - extra - cent < 0) {
@@ -366,7 +366,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
                     if (hit.gameObject.GetComponent<TileBehavior>().HasUnit()) {
                         // And the unit belongs to the enemy team...
                         GameObject hitUnit = hit.gameObject.GetComponent<TileBehavior>().GetUnit();
-                        if (hitUnit.GetComponent<Character>().GetPlayer() != selectedUnit.GetComponent<Character>().GetPlayer()) {
+                        if (hitUnit.GetComponent<Character>().GetPlayer() != selectedUnit.GetComponent<Character>().GetPlayer() && hitUnit.GetComponent<Character>().currentHealth > 0) {
                             hit.gameObject.GetComponent<TileBehavior>().HighlightCanAttack();
                         }
                         // And the unit belongs to the player team...
@@ -392,7 +392,7 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
         int dist = Mathf.Abs(xPosition - originalTile.xPosition) + Mathf.Abs(yPosition - originalTile.yPosition);
         if (dist >= unit.minrange && dist <= unit.maxrange) {
             if (!highlighted) {
-                if (myUnit != null && myUnit.GetComponent<Character>().GetPlayer() != selectedUnit.GetComponent<Character>().GetPlayer()) {
+                if (myUnit != null && myUnit.GetComponent<Character>().GetPlayer() != selectedUnit.GetComponent<Character>().GetPlayer() && myUnit.GetComponent<Character>().currentHealth > 0) {
                     HighlightCanAttack();
                 }
                 else {
@@ -688,9 +688,6 @@ public abstract class TileBehavior : MonoBehaviour, IPointerClickHandler, IPoint
         }
         selectedTile = null;
         selectionState = null;
-
-        //Get rid of all the UI
-        GameManager.GetSingleton().ClearUI();
     }
 
     public static void Unhighlight() {
