@@ -244,13 +244,10 @@ public class TestClass : Character
         }
         if (unitName == "Enforcer")
         {
-            int dist = 0;
-            dist += Mathf.Abs(positionx - target.GetComponent<TestClass>().positionx);
-            dist += Mathf.Abs(positiony - target.GetComponent<TestClass>().positiony);
-            curdmg = dist + 1;
+            curdmg = 6;
             if (canMove == false)
             {
-                curdmg = (int) Mathf.Floor(curdmg / 2);
+                curdmg = 3;
             }
         }
         if (unitName == "Grasshopper")

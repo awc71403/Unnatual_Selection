@@ -27,11 +27,13 @@ public class Nexus : TileBehavior
     }
 
     public override void OnPointerClick(PointerEventData data) {
-        base.OnPointerClick(data);
+        if (selectionState == null) {
+            base.OnPointerClick(data);
 
-        if (playerside == GameManager.currentPlayer && data.button == PointerEventData.InputButton.Left && !GameManager.menuOpened) {
-            // Make sure you can't click on tiles while buying a unit
-            GameManager.GetSingleton().OpenSummonPanel();
+            if (playerside == GameManager.currentPlayer && data.button == PointerEventData.InputButton.Left && !GameManager.menuOpened) {
+                // Make sure you can't click on tiles while buying a unit
+                GameManager.GetSingleton().OpenSummonPanel();
+            }
         }
     }
 
