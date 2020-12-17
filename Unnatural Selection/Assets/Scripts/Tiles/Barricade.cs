@@ -12,7 +12,7 @@ public class Barricade : TileBehavior
         movementCost = movement;
         tileType = "barricade";
         tileName = "Barricade";
-        tileDesc = "Cost: 2\n\nAlthough troublesome to get into, taking cover here will reduced the damage by half the first time you're hit.";
+        tileDesc = "Cost: 2\n\nAlthough troublesome to get into, taking cover here negate the first attack for enemies each turn.";
     }
 
     // Update is called once per frame
